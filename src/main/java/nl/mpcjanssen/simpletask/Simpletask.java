@@ -456,7 +456,6 @@ public class Simpletask extends ThemedListActivity implements
     protected void onResume() {
         super.onResume();
         Log.v(TAG,"onResume");
-        handleIntent();
     }
 
     @Override
