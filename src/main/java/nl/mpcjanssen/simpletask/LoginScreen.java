@@ -56,9 +56,10 @@ public class LoginScreen extends Activity {
         m_broadcastReceiver = new BroadcastReceiver() {
             @Override
             public void onReceive(Context context, Intent intent) {
-                Intent i = new Intent(context, Simpletask.class);
-                startActivity(i);
                 finish();
+                Intent i = new Intent(context, Simpletask.class);
+                i.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP) ;
+                startActivity(i);
             }
         };
         localBroadcastManager.registerReceiver(m_broadcastReceiver, intentFilter);
