@@ -273,7 +273,6 @@ public class Simpletask extends ThemedListActivity implements
     private void handleIntent() {
         if (!m_app.isAuthenticated()) {
             Log.v(TAG, "handleIntent: not authenticated");
-            finish();
             startLogin();
             return;
         }

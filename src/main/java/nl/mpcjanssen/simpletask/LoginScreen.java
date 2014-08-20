@@ -40,7 +40,6 @@ public class LoginScreen extends Activity {
 
     private TodoApplication m_app;
     private BroadcastReceiver m_broadcastReceiver;
-    private LocalBroadcastManager localBroadcastManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -49,21 +48,6 @@ public class LoginScreen extends Activity {
         m_app = (TodoApplication) getApplication();
         setTheme(m_app.getActiveTheme());
         setContentView(R.layout.login);
-        localBroadcastManager = LocalBroadcastManager.getInstance(this);
-
-        IntentFilter intentFilter = new IntentFilter();
-        intentFilter.addAction("nl.mpcjanssen.simpletask.ACTION_LOGIN");
-        m_broadcastReceiver = new BroadcastReceiver() {
-            @Override
-            public void onReceive(Context context, Intent intent) {
-                finish();
-                Intent i = new Intent(context, Simpletask.class);
-                i.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP) ;
-                startActivity(i);
-            }
-        };
-        localBroadcastManager.registerReceiver(m_broadcastReceiver, intentFilter);
-
         Button m_LoginButton = (Button) findViewById(R.id.login);
         m_LoginButton.setOnClickListener(new OnClickListener() {
             @Override
@@ -78,9 +62,10 @@ public class LoginScreen extends Activity {
     }
 
     private void switchToTodolist() {
-        Intent intent = new Intent(this, Simpletask.class);
-        startActivity(intent);
         finish();
+        Intent intent = new Intent(this, Simpletask.class);
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        startActivity(intent);
     }
 
     @Override
@@ -99,7 +84,6 @@ public class LoginScreen extends Activity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        localBroadcastManager.unregisterReceiver(m_broadcastReceiver);
     }
 
     void startLogin() {
