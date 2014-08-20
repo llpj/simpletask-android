@@ -193,7 +193,6 @@ public class FilterActivity extends ThemedActivity {
     @NotNull
     private Intent createFilterIntent() {
         Intent target = new Intent(this, Simpletask.class);
-        target.setAction(Constants.INTENT_START_FILTER);
         updateFilterFromFragments();
         mFilter.setName(mFilter.getProposedName());
         mFilter.saveInIntent(target);

@@ -40,7 +40,6 @@ public class Constants {
     public final static String SHARE_FILE_NAME = "simpletask.txt";
 
     // Public intents
-    public final static String INTENT_START_FILTER = "nl.mpcjanssen.simpletask.START_WITH_FILTER";
     public final static String INTENT_BACKGROUND_TASK = "nl.mpcjanssen.simpletask.BACKGROUND_TASK";
 
 

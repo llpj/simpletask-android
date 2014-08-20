@@ -205,6 +205,11 @@ public class Simpletask extends ThemedListActivity implements
         m_savedInstanceState = savedInstanceState;
 
         super.onCreate(savedInstanceState);
+        if (!isTaskRoot()) {
+            Log.v(TAG, "onCreate exited, not at root");
+            finish();
+            return;
+         }
 
         m_app.prefsChangeListener(this);
 
@@ -262,6 +267,7 @@ public class Simpletask extends ThemedListActivity implements
             }
         }
         setProgressBarIndeterminateVisibility(false);
+        handleIntent();
     }
 
     private void handleIntent() {
@@ -324,9 +330,8 @@ public class Simpletask extends ThemedListActivity implements
 
         // Show search or filter results
         Intent intent = getIntent();
-        if (Constants.INTENT_START_FILTER.equals(intent.getAction())) {
-            mFilter.initFromIntent(intent);
-            Log.v(TAG, "handleIntent: launched with filter" + mFilter);
+        if ( mFilter.initFromIntent(intent)) {
+            Log.v(TAG, "handleIntent: launched with extras" + mFilter);
             Log.v(TAG, "handleIntent: saving filter in prefs");
             mFilter.saveInPrefs(TodoApplication.getPrefs());
         } else {
@@ -423,7 +428,9 @@ public class Simpletask extends ThemedListActivity implements
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        localBroadcastManager.unregisterReceiver(m_broadcastReceiver);
+        if (localBroadcastManager!=null) {
+            localBroadcastManager.unregisterReceiver(m_broadcastReceiver);
+        }
     }
 
     @Override
@@ -448,6 +455,7 @@ public class Simpletask extends ThemedListActivity implements
     @Override
     protected void onResume() {
         super.onResume();
+        Log.v(TAG,"onResume");
         handleIntent();
     }
 
@@ -787,6 +795,7 @@ public class Simpletask extends ThemedListActivity implements
     @Override
     protected void onNewIntent(@NotNull Intent intent) {
         super.onNewIntent(intent);
+        Log.v(TAG, "onNewIntent: " + intent);
         if (Intent.ACTION_SEARCH.equals(intent.getAction())) {
             Intent currentIntent = getIntent();
             currentIntent.putExtra(SearchManager.QUERY, intent.getStringExtra(SearchManager.QUERY));
@@ -796,8 +805,7 @@ public class Simpletask extends ThemedListActivity implements
             // Only change intent if it actually contains a filter
             setIntent(intent);
         }
-        Log.v(TAG, "onNewIntent: " + intent);
-
+        handleIntent();
     }
 
     void clearFilter() {
@@ -886,7 +894,7 @@ public class Simpletask extends ThemedListActivity implements
 
     public void createFilterShortcut(@NotNull ActiveFilter filter) {
         final Intent shortcut = new Intent("com.android.launcher.action.INSTALL_SHORTCUT");
-        Intent target = new Intent(Constants.INTENT_START_FILTER);
+        Intent target = new Intent(this, Simpletask.class);
         filter.saveInIntent(target);
 
         target.putExtra("name", filter.getName());

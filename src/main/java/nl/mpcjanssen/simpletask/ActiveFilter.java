@@ -99,16 +99,19 @@ public class ActiveFilter {
     public ActiveFilter() {
     }
 
-    public void initFromIntent(@NotNull Intent intent) {
+    public boolean initFromIntent(@NotNull Intent intent) {
         String prios;
         String projects;
         String contexts;
         String sorts;
 
+        sorts = intent.getStringExtra(INTENT_SORT_ORDER);
+        if (sorts == null) {
+            return false;
+        }
         prios = intent.getStringExtra(INTENT_PRIORITIES_FILTER);
         projects = intent.getStringExtra(INTENT_PROJECTS_FILTER);
         contexts = intent.getStringExtra(INTENT_CONTEXTS_FILTER);
-        sorts = intent.getStringExtra(INTENT_SORT_ORDER);
 
         m_javascript = intent.getStringExtra(INTENT_JAVASCRIPT_FILTER);
         m_javascript_test_task = intent.getStringExtra(INTENT_JAVASCRIPT_TEST_TASK_FILTER);
@@ -143,6 +146,7 @@ public class ActiveFilter {
             m_contexts = new ArrayList<String>(Arrays.asList(contexts
                     .split(INTENT_EXTRA_DELIMITERS)));
         }
+        return true;
     }
 
     public void initFromPrefs(@NotNull SharedPreferences prefs) {
