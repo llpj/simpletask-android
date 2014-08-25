@@ -43,7 +43,7 @@ import nl.mpcjanssen.simpletask.util.Util;
  */
 public class FileStore implements FileStoreInterface {
 
-    private final String TAG = getClass().getName();
+    private final String TAG = getClass().getSimpleName();
     private String mEol;
     @Nullable
     private DbxFile.Listener m_observer;
@@ -296,7 +296,12 @@ public class FileStore implements FileStoreInterface {
                     @Override
                     public void onFileChange(@NotNull DbxFile dbxFile) {
                         DbxFileStatus status;
+                        String  name;
                         try {
+                            name = dbxFile.getInfo().path.getName();
+                            if (!name.equals(new DbxPath(activePath).getName())) {
+                                Log.v(TAG, "Sync conflict detected. New filename: " + name);
+                            }
                             status = dbxFile.getSyncStatus();
                             Log.v(TAG, "Synchronizing path change: " + dbxFile.getPath().getName() + " latest: " + status.isLatest +
                                        status.bytesTransferred + "/" + status.bytesTotal);
