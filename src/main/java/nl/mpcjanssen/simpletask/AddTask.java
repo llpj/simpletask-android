@@ -625,15 +625,20 @@ public class AddTask extends ThemedActivity {
         return -1;
     }
 
+    ArrayList <String> getLines() {
+        ArrayList<String> lines = new ArrayList<String>();
+        Collections.addAll(lines, textInputField.getText().toString().split("\\n", -1));
+        return lines;
+    }
+
     private void replaceDueDate(@NotNull CharSequence newDueDate) {
         // save current selection and length
         int start = textInputField.getSelectionStart();
         int end = textInputField.getSelectionEnd();
         int length = textInputField.getText().length();
         int sizeDelta;
-        ArrayList<String> lines = new ArrayList<String>();
-        Collections.addAll(lines, textInputField.getText().toString().split("\\n", -1));
 
+        ArrayList<String> lines = getLines();
         // For some reason the currentLine can be larger than the amount of lines in the EditText
         // Check for this case to prevent any array index out of bounds errors
         int currentLine = getCurrentCursorLine(textInputField);
