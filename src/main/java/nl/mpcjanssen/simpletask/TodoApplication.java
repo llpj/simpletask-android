@@ -296,13 +296,13 @@ public class TodoApplication extends Application implements SharedPreferences.On
     public int getActiveTheme() {
         String theme =  getPrefs().getString(getString(R.string.theme_pref_key), "");
         if (theme.equals("android.R.style.Theme_Holo")) {
-            return android.R.style.Theme_Material;
+            return R.style.Theme_AppCompat;
         } else if (theme.equals("android.R.style.Theme_Holo_Light_DarkActionBar")) {
-            return android.R.style.Theme_Material_Light_DarkActionBar;
+            return R.style.Theme_AppCompat_Light_DarkActionBar;
         } else if (theme.equals("android.R.style.Theme_Holo_Light")) {
-            return android.R.style.Theme_Material_Light;
+            return R.style.Theme_AppCompat_Light;
         } else  {
-            return android.R.style.Theme_Material_Light_DarkActionBar;
+            return R.style.Theme_AppCompat_Light_DarkActionBar;
         }
     }
 

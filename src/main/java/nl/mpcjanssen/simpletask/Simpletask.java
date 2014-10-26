@@ -275,7 +275,7 @@ public class Simpletask extends ThemedListActivity implements
             m_sync_dialog.setIndeterminate(true);
             m_sync_dialog.setMessage("Initial Dropbox sync in progress, please wait....");
             m_sync_dialog.setCancelable(false);
-            m_sync_dialog.show();
+            // m_sync_dialog.show();
         } else if (m_sync_dialog!=null) {
             m_sync_dialog.cancel();
         }

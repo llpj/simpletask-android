@@ -148,6 +148,7 @@ dependencies {
     compile 'com.darwinsys:hirondelle-date4j:1.5.1'
     compile 'com.google.guava:guava:17.0'
     compile 'org.mozilla:rhino:1.7R4'
+    compile 'com.android.support:appcompat-v7:21.+'
 }
 check.dependsOn unitTest
 preBuild.dependsOn buildInfo
