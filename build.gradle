@@ -102,8 +102,8 @@ android {
         exclude 'LICENSE.txt'
     }
 
-    buildToolsVersion "20.0.0"
-    compileSdkVersion 20
+    buildToolsVersion "21.0.2"
+    compileSdkVersion 21
 
     defaultConfig {
         versionName '5.2.11'
