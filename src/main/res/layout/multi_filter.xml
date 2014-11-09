@@ -22,7 +22,6 @@
 	  android:layout_height="wrap_content"
 	  android:layout_alignParentLeft="true"
 	  android:layout_alignParentTop="true"
-	  android:layout_marginTop="20dp"
 	  android:textOn="Yes"
 	  android:textOff="No" />
 
@@ -46,7 +45,6 @@
 	  android:layout_height="wrap_content"
 	  android:layout_alignParentLeft="true"
 	  android:layout_alignParentTop="true"
-	  android:layout_marginTop="20dp"
 	  android:textOn="Any"
 	  android:textOff="All" />
     </LinearLayout>
