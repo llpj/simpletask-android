@@ -27,7 +27,7 @@ public class FilterListFragment extends Fragment {
 
     final static String TAG = FilterListFragment.class.getSimpleName();
     private ListView lv;
-    private CheckBox cb;
+    private Switch invertSwitch;
     private Switch orSwitch;
     private GestureDetector gestureDetector;
     @Nullable
@@ -81,7 +81,7 @@ public class FilterListFragment extends Fragment {
         LinearLayout layout = (LinearLayout) inflater.inflate(R.layout.multi_filter,
                 container, false);
 
-        cb = (CheckBox) layout.findViewById(R.id.checkbox);
+        invertSwitch = (Switch) layout.findViewById(R.id.invertSwitch);
         orSwitch = (Switch) layout.findViewById(R.id.orSwitch);
 
         lv = (ListView) layout.findViewById(R.id.listview);
@@ -96,7 +96,7 @@ public class FilterListFragment extends Fragment {
             }
         }
 
-        cb.setChecked(not);
+        invertSwitch.setChecked(not);
 	orSwitch.setChecked(isOr);
 
         gestureDetector = new GestureDetector(TodoApplication.getAppContext(),
@@ -120,10 +120,10 @@ public class FilterListFragment extends Fragment {
     }
 
     public boolean getNot() {
-        if (cb == null) {
+        if (invertSwitch == null) {
             return not;
         } else {
-            return cb.isChecked();
+            return invertSwitch.isChecked();
         }
     }
 
