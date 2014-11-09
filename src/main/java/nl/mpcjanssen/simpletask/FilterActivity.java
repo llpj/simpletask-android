@@ -40,6 +40,7 @@ public class FilterActivity extends ThemedActivity {
     public static final String FILTER_ITEMS = "items";
     public static final String INITIAL_SELECTED_ITEMS = "initialSelectedItems";
     public static final String INITIAL_NOT = "initialNot";
+    public static final String INITIAL_OR = "initialOr";
 
     boolean asWidgetConfigure = false;
     ActiveFilter mFilter;
@@ -101,6 +102,7 @@ public class FilterActivity extends ThemedActivity {
                 Util.sortWithPrefix(m_app.getTaskCache().getContexts(), m_app.sortCaseSensitive(), "-"));
         arguments.putStringArrayList(INITIAL_SELECTED_ITEMS, mFilter.getContexts());
         arguments.putBoolean(INITIAL_NOT, mFilter.getContextsNot());
+        arguments.putBoolean(INITIAL_OR, mFilter.getContextsIsOr());
         actionbar.addTab(actionbar.newTab()
                 .setText(getString(R.string.context_prompt))
                 .setTabListener(new MyTabsListener(this, CONTEXT_TAB, FilterListFragment.class.getName(), arguments))
@@ -209,6 +211,7 @@ public class FilterActivity extends ThemedActivity {
             mFilter.setContexts(items);
         }
         mFilter.setContextsNot(getNot(CONTEXT_TAB,mFilter.getContextsNot()));
+        mFilter.setContextsIsOr(getOr(CONTEXT_TAB,mFilter.getContextsIsOr()));
 
         items = getFragmentFilter(PROJECT_TAB);
         if (items!=null) {
@@ -336,6 +339,16 @@ public class FilterActivity extends ThemedActivity {
         }
     }
 
+    private boolean getOr(String tag, boolean current) {
+        FilterListFragment fr;
+        fr = (FilterListFragment) this.getFragmentManager().findFragmentByTag(tag);
+        if (fr == null) {
+            // fragment was never intialized
+            return current;
+        } else {
+            return fr.getOr();
+        }
+    }
     
     private void createWidget(String name) {
     	int mAppWidgetId;

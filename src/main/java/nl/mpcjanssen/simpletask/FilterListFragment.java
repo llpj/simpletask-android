@@ -14,6 +14,7 @@ import android.view.ViewGroup;
 import android.widget.AbsListView;
 import android.widget.ArrayAdapter;
 import android.widget.CheckBox;
+import android.widget.Switch;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 
@@ -27,12 +28,14 @@ public class FilterListFragment extends Fragment {
     final static String TAG = FilterListFragment.class.getSimpleName();
     private ListView lv;
     private CheckBox cb;
+    private Switch orSwitch;
     private GestureDetector gestureDetector;
     @Nullable
     ActionBar actionbar;
     private ArrayList<String> selectedItems;
     private boolean not;
-
+    private boolean isOr;
+    
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -51,6 +54,7 @@ public class FilterListFragment extends Fragment {
         Log.v(TAG, "onSaveInstanceState() this:" + this);
         outState.putStringArrayList("selectedItems", getSelectedItems());
         outState.putBoolean("not", getNot());
+        outState.putBoolean("isOr", getOr());
 
     }
 
@@ -66,9 +70,11 @@ public class FilterListFragment extends Fragment {
         if (savedInstanceState != null) {
             selectedItems = savedInstanceState.getStringArrayList("selectedItems");
             not = savedInstanceState.getBoolean("not");
+	    isOr = savedInstanceState.getBoolean("isOr");
         } else {
             selectedItems = arguments.getStringArrayList(FilterActivity.INITIAL_SELECTED_ITEMS);
             not = arguments.getBoolean(FilterActivity.INITIAL_NOT);
+            isOr = arguments.getBoolean(FilterActivity.INITIAL_OR);	    
         }
 
         Log.v(TAG, "Fragment bundle:" + this + " arguments:" + arguments);
@@ -76,6 +82,7 @@ public class FilterListFragment extends Fragment {
                 container, false);
 
         cb = (CheckBox) layout.findViewById(R.id.checkbox);
+        orSwitch = (Switch) layout.findViewById(R.id.orSwitch);
 
         lv = (ListView) layout.findViewById(R.id.listview);
         lv.setChoiceMode(AbsListView.CHOICE_MODE_MULTIPLE);
@@ -116,6 +123,14 @@ public class FilterListFragment extends Fragment {
             return not;
         } else {
             return cb.isChecked();
+        }
+    }
+
+    public boolean getOr() {
+        if (orSwitch == null) {
+            return isOr;
+        } else {
+            return orSwitch.isChecked();
         }
     }
 

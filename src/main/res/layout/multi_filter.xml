@@ -40,7 +40,7 @@
                 android:layout_height="wrap_content"
                 android:text="Match: "/>
       <Switch
-	  android:id="@+id/andorSwitch"
+	  android:id="@+id/orSwitch"
 	  android:layout_width="wrap_content"
 	  android:layout_height="wrap_content"
 	  android:layout_alignParentRight="true"
