@@ -50,6 +50,7 @@ public class ActiveFilter {
     public final static String INTENT_CONTEXTS_FILTER_NOT = "CONTEXTSnot";
     public final static String INTENT_PROJECTS_FILTER_NOT = "PROJECTSnot";
     public final static String INTENT_PRIORITIES_FILTER_NOT = "PRIORITIESnot";
+    public final static String INTENT_CONTEXTS_FILTER_IS_OR = "CONTEXTSor";
 
     public final static String INTENT_HIDE_COMPLETED_FILTER = "HIDECOMPLETED";
     public final static String INTENT_HIDE_FUTURE_FILTER = "HIDEFUTURE";
@@ -71,6 +72,7 @@ public class ActiveFilter {
     private String m_search;
     private boolean m_priosNot = false;
     private boolean m_contextsNot = false;
+    private boolean m_contextsIsOr = true;
     private boolean m_hideCompleted = false;
     private boolean m_hideFuture = false;
     private boolean m_hideLists = false;
@@ -156,6 +158,7 @@ public class ActiveFilter {
         m_projects = new ArrayList<String>(prefs.getStringSet(
                 INTENT_PROJECTS_FILTER, Collections.<String>emptySet()));
         m_contextsNot = prefs.getBoolean(INTENT_CONTEXTS_FILTER_NOT, false);
+        m_contextsIsOr = prefs.getBoolean(INTENT_CONTEXTS_FILTER_IS_OR, true);
         m_priosNot = prefs.getBoolean(INTENT_PRIORITIES_FILTER_NOT, false);
         m_projectsNot = prefs.getBoolean(INTENT_PROJECTS_FILTER_NOT, false);
         m_hideCompleted = prefs.getBoolean(INTENT_HIDE_COMPLETED_FILTER, false);
@@ -301,6 +304,13 @@ public class ActiveFilter {
 
     public void setContextsNot(boolean state) {
         this.m_contextsNot = state;
+    }
+    public boolean getContextsIsOr() {
+        return m_contextsIsOr;
+    }
+
+    public void setContextsIsOr(boolean state) {
+        this.m_contextsIsOr = state;
     }
 
     public ArrayList<String> getProjects() {
@@ -456,7 +466,7 @@ public class ActiveFilter {
                 addFilter(new ByPriorityFilter(m_prios, m_priosNot));
             }
             if (m_contexts.size() > 0) {
-                addFilter(new ByContextFilter(m_contexts, m_contextsNot));
+                addFilter(new ByContextFilter(m_contexts, m_contextsNot, m_contextsIsOr));
             }
             if (m_projects.size() > 0) {
                 addFilter(new ByProjectFilter(m_projects, m_projectsNot));
