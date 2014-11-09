@@ -121,6 +121,9 @@ public class ActiveFilter {
                 INTENT_PROJECTS_FILTER_NOT, false);
         m_contextsNot = intent.getBooleanExtra(
                 INTENT_CONTEXTS_FILTER_NOT, false);
+        m_contextsIsOr = intent.getBooleanExtra(
+                INTENT_CONTEXTS_FILTER_IS_OR, true);
+       
         m_hideCompleted = intent.getBooleanExtra(
                 INTENT_HIDE_COMPLETED_FILTER, false);
         m_hideFuture = intent.getBooleanExtra(
@@ -238,6 +241,7 @@ public class ActiveFilter {
         if (target != null) {
             target.putExtra(INTENT_CONTEXTS_FILTER, Util.join(m_contexts, "\n"));
             target.putExtra(INTENT_CONTEXTS_FILTER_NOT, m_contextsNot);
+            target.putExtra(INTENT_CONTEXTS_FILTER_IS_OR, m_contextsIsOr);
             target.putExtra(INTENT_PROJECTS_FILTER, Util.join(m_projects, "\n"));
             target.putExtra(INTENT_PROJECTS_FILTER_NOT, m_projectsNot);
             target.putExtra(INTENT_PRIORITIES_FILTER, Util.join(m_prios, "\n"));

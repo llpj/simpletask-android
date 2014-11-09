@@ -97,6 +97,7 @@ public class FilterListFragment extends Fragment {
         }
 
         cb.setChecked(not);
+	orSwitch.setChecked(isOr);
 
         gestureDetector = new GestureDetector(TodoApplication.getAppContext(),
                 new FilterGestureDetector());
