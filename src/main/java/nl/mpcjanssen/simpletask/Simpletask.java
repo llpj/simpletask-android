@@ -1679,7 +1679,7 @@ public class Simpletask extends ThemedListActivity implements
             if (adapter.getProjectsHeaderPosition() == position) {
                 mFilter.setProjectsNot(!mFilter.getProjectsNot());
             }
-            if (adapter.getContextHeaderPosition() == position) {
+            if (adapter.getContextHeaderPosition()+1 == position) {
                 mFilter.setContextsNot(!mFilter.getContextsNot());
             } else {
                 tags = Util.getCheckedItems(lv, true);
