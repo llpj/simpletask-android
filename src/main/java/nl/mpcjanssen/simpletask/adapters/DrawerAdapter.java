@@ -6,6 +6,8 @@ import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.ListAdapter;
 import android.widget.ListView;
+import android.widget.LinearLayout;
+import android.widget.Switch;
 import android.widget.TextView;
 
 import java.util.ArrayList;
@@ -99,6 +101,10 @@ public class DrawerAdapter extends BaseAdapter implements ListAdapter {
 
         } else if (isOrSwitch(position)) {
            convertView = m_inflater.inflate(R.layout.drawer_list_or_switch, parent, false);
+            ListView lv = (ListView) parent;
+	    LinearLayout layout = (LinearLayout) convertView;
+	    Switch s = (Switch)layout.findViewById(R.id.switchView);
+	    s.setChecked(lv.isItemChecked(position));
 	} else {
             if (convertView == null) {
                 convertView = m_inflater.inflate(R.layout.drawer_list_item_checked, parent, false);
@@ -155,4 +161,4 @@ public class DrawerAdapter extends BaseAdapter implements ListAdapter {
 	public String value; 
     }
 
-}
+ }

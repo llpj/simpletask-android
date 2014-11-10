@@ -1009,6 +1009,7 @@ public class Simpletask extends ThemedListActivity implements
             }
         }
         m_leftDrawerList.setItemChecked(drawerAdapter.getContextHeaderPosition()+1, mFilter.getContextsNot());
+        m_leftDrawerList.setItemChecked(drawerAdapter.getContextHeaderPosition(), mFilter.getContextsNot());
         m_leftDrawerList.setItemChecked(drawerAdapter.getProjectsHeaderPosition(), mFilter.getProjectsNot());
     }
 
