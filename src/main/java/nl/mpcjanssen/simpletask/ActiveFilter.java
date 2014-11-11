@@ -266,6 +266,7 @@ public class ActiveFilter {
                     new HashSet<String>(Priority.inCode(m_prios)));
             editor.putStringSet(INTENT_PROJECTS_FILTER, new HashSet<String>(m_projects));
             editor.putBoolean(INTENT_CONTEXTS_FILTER_NOT, m_contextsNot);
+            editor.putBoolean(INTENT_CONTEXTS_FILTER_IS_OR, m_contextsIsOr);
             editor.putBoolean(INTENT_PRIORITIES_FILTER_NOT, m_priosNot);
             editor.putBoolean(INTENT_PROJECTS_FILTER_NOT, m_projectsNot);
             editor.putBoolean(INTENT_HIDE_COMPLETED_FILTER, m_hideCompleted);
