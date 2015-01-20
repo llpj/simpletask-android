@@ -1,11 +1,12 @@
 <!--suppress ALL -->
 
 
-<menu xmlns:android="http://schemas.android.com/apk/res/android">
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+      xmlns:app="http://schemas.android.com/apk/res-auto">
     <item
             android:id="@+id/menu_filter_action"
             android:orderInCategory="100"
-            android:showAsAction="always"
+            app:showAsAction="always"
             android:icon="@drawable/complete_light"
             android:title="@string/filter"/>
 </menu>
