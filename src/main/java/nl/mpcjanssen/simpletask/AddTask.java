@@ -125,6 +125,9 @@ public class AddTask extends ThemedActivity {
         switch (item.getItemId()) {
             // Respond to the action bar's Up/Home button
             case android.R.id.home:
+                if (m_app.isBackSaving()) {
+                    saveTasksAndClose();
+                }
                 Intent upIntent = NavUtils.getParentActivityIntent(this);
                 finish();
                 startActivity(upIntent);
@@ -219,7 +222,11 @@ public class AddTask extends ThemedActivity {
 
     private void addBackgroundTask(String taskText) {
         ArrayList<Task> bgTask = new ArrayList<Task>();
-        bgTask.add(new Task(0,taskText));
+        if (m_app.hasPrependDate()) {
+            bgTask.add(new Task(0,taskText, DateTime.today(TimeZone.getDefault())));
+        } else {
+            bgTask.add(new Task(0,taskText));
+        }
         m_app.getTaskCache().modify(null,null,bgTask,null);
         m_app.updateWidgets();
         Util.showToastShort(m_app, R.string.task_added);
@@ -481,6 +488,10 @@ public class AddTask extends ThemedActivity {
                             today.getMonth()-1,
                             today.getDay());
 
+                    boolean showCalendar = m_app.showCalendar();
+
+                    dialog.getDatePicker().setCalendarViewShown(showCalendar);
+                    dialog.getDatePicker().setSpinnersShown(!showCalendar);
                     dialog.show();
                 } else {
                     insertDateAtSelection(dateType, Util.addInterval(DateTime.today(TimeZone.getDefault()), selected));
@@ -659,6 +670,8 @@ public class AddTask extends ThemedActivity {
         // save current selection and length
         int start = textInputField.getSelectionStart();
         int end = textInputField.getSelectionEnd();
+        int length = textInputField.getText().length();
+        int sizeDelta;
         ArrayList<String> lines = new ArrayList<String>();
         Collections.addAll(lines, textInputField.getText().toString().split("\\n", -1));
 
@@ -675,6 +688,11 @@ public class AddTask extends ThemedActivity {
             textInputField.setText(Util.join(lines, "\n"));
         }
         // restore selection
+        int newLength = textInputField.getText().length();
+        sizeDelta = newLength - length;
+        int newStart = Math.max(0, start + sizeDelta);
+        int newEnd = Math.min(end + sizeDelta, newLength);
+        newEnd = Math.max(newStart, newEnd);
         textInputField.setSelection(start, end);
     }
 

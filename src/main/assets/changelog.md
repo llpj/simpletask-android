@@ -1,10 +1,20 @@
 ﻿Changelog
 =========
 
+5.2.13
+------
+
+- Add option to send logs directly from the app. Fixes [#174](https://github.com/mpcjanssen/simpletask-android/issues/174).
+- Respect calendar setting when changing dates in AddTask activity. Fixes [#145](https://github.com/mpcjanssen/simpletask-android/issues/145).
+- Allow sharing of application log from the settings for better FDroid and debugging support.
+
 5.2.12
 ------
 
 - Added Italian translation (thanks to Carlo D.)
+- Fix link to issue tracker.
+- Observe .txt only setting for Cloudless build.  Fixes [#154](https://github.com/mpcjanssen/simpletask-android/issues/154).
+- Updated Dropbox API to 3.1.1. Possible fix for Lollipop issues [#163](https://github.com/mpcjanssen/simpletask-android/issues/163).
 	
 5.2.11
 ------
