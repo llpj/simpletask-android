@@ -346,39 +346,18 @@ public class Simpletask extends ThemedListActivity implements
         lv.setMultiChoiceModeListener(new ActionBarListener());
         // If we were started with a selected task,
         // select it now and clear it from the intent
-        String selectedTask = intent.getStringExtra(Constants.INTENT_SELECTED_TASK);
-        if (!Strings.isEmptyOrNull(selectedTask)) {
-            String[] parts = selectedTask.split(":", 2);
-            setSelectedTask(Integer.valueOf(parts[0]), parts[1]);
-            intent.removeExtra(Constants.INTENT_SELECTED_TASK);
-            setIntent(intent);
-        } else {
-            // Set the adapter for the list view
-            updateDrawers();
-        }
         if (m_savedInstanceState != null) {
             ArrayList<String> selection = m_savedInstanceState.getStringArrayList("selection");
             int position = m_savedInstanceState.getInt("position");
             if (selection != null) {
                 for (String selected : selection) {
                     String[] parts = selected.split(":", 2);
-                    setSelectedTask(Integer.valueOf(parts[0]), parts[1]);
                 }
             }
             lv.setSelectionFromTop(position,0);
         }
     }
 
-    private void setSelectedTask(int index, @NotNull String selectedTask) {
-        Log.v(TAG, "Selected task: " + selectedTask);
-        Task task = new Task(index, selectedTask);
-        int position = m_adapter.getPosition(task);
-        if (position != -1) {
-            ListView lv = getListView();
-            lv.setItemChecked(position, true);
-            lv.setSelection(position);
-        }
-    }
 
     private void updateFilterBar() {
         ListView lv = getListView();
@@ -395,7 +374,7 @@ public class Simpletask extends ThemedListActivity implements
             actionbar.setVisibility(View.GONE);
         }
         int count = m_adapter!=null ? m_adapter.getCountVisbleTasks() : 0;
-        int total = m_app.getFileStore()!=null ? m_app.getFileStore().getLines() : 0;
+        int total = m_app.getFileStore()!=null ? m_app.getFileStore().getCount() : 0;
 
         filterText.setText(mFilter.getTitle(
                 count,
@@ -1070,8 +1049,6 @@ public class Simpletask extends ThemedListActivity implements
         }
 
         @NotNull
-        ArrayList<VisibleLine> visibleLines = new ArrayList<VisibleLine>();
-        @NotNull
         Set<DataSetObserver> obs = new HashSet<DataSetObserver>();
         private LayoutInflater m_inflater;
         private int countVisbleTasks;
@@ -1081,50 +1058,9 @@ public class Simpletask extends ThemedListActivity implements
         }
 
         void setFilteredTasks() {
-            ArrayList<Task> visibleTasks = new ArrayList<>();
-            countVisbleTasks = 0;
+
             Log.v(TAG, "setFilteredTasks called");
-            ArrayList<String> sorts = mFilter.getSort(m_app.getDefaultSorts());
-            visibleTasks.addAll(m_app.getFileStore().getTasks(mFilter));
-            visibleLines.clear();
 
-            String header = "";
-            String newHeader;
-            int firstGroupSortIndex = 0;
-
-            if (sorts.size() > 1 && sorts.get(0).contains("completed")
-                    || sorts.get(0).contains("future")) {
-                firstGroupSortIndex++;
-                if (sorts.size() > 2 && sorts.get(1).contains("completed")
-                        || sorts.get(1).contains("future")) {
-                    firstGroupSortIndex++;
-                }
-            }
-            String firstSort = sorts.get(firstGroupSortIndex);
-            for (Task t : visibleTasks) {
-                newHeader = t.getHeader(firstSort, getString(R.string.no_header));
-                if (!header.equals(newHeader)) {
-                    VisibleLine headerLine = new VisibleLine(newHeader);
-                    int last = visibleLines.size() - 1;
-                    if (last != -1 && visibleLines.get(last).header && !m_app.showEmptyLists()) {
-                        visibleLines.set(last, headerLine);
-                    } else {
-                        visibleLines.add(headerLine);
-                    }
-                    header = newHeader;
-                }
-
-                if (t.isVisible() || m_app.showHidden()) {
-                    // enduring tasks should not be displayed
-                    VisibleLine taskLine = new VisibleLine(t);
-                    visibleLines.add(taskLine);
-                    countVisbleTasks++;
-                }
-            }
-            for (DataSetObserver ob : obs) {
-                ob.onChanged();
-            }
-            updateFilterBar();
 
         }
 
@@ -1136,13 +1072,6 @@ public class Simpletask extends ThemedListActivity implements
             obs.add(observer);
         }
 
-        /*
-        ** Get the adapter position for task
-        */
-        public int getPosition(Task task) {
-            VisibleLine line = new VisibleLine(task);
-            return visibleLines.indexOf(line);
-        }
 
         @Override
         public void unregisterDataSetObserver(DataSetObserver observer) {
@@ -1151,17 +1080,14 @@ public class Simpletask extends ThemedListActivity implements
 
         @Override
         public int getCount() {
-            return visibleLines.size();
+            return m_app.getFileStore().getCount();
         }
 
         @Nullable
         @Override
         public Task getItem(int position) {
-            VisibleLine line = visibleLines.get(position);
-            if (line.header) {
-                return null;
-            }
-            return line.task;
+            return m_app.getFileStore().get(mFilter,position);
+
         }
 
         @Override
@@ -1178,16 +1104,8 @@ public class Simpletask extends ThemedListActivity implements
         @Nullable
         @Override
         public View getView(int position, @Nullable View convertView, ViewGroup parent) {
-            VisibleLine line = visibleLines.get(position);
-            if (line.header) {
-                if (convertView == null) {
-                    convertView = m_inflater.inflate(R.layout.list_header, parent, false);
-                }
-                TextView t = (TextView) convertView
-                        .findViewById(R.id.list_header_title);
-                t.setText(line.task.inFileFormat());
+            Task t = m_app.getFileStore().get(mFilter,position);
 
-            } else {
                 final ViewHolder holder;
                 if (convertView == null) {
                     convertView = m_inflater.inflate(R.layout.list_item, parent, false);
@@ -1207,7 +1125,7 @@ public class Simpletask extends ThemedListActivity implements
                     holder = (ViewHolder) convertView.getTag();
                 }
                 Task task;
-                task = line.task;
+                task = t;
                 if (m_app.showCompleteCheckbox()) {
                     holder.cbCompleted.setVisibility(View.VISIBLE);
                 } else {
@@ -1320,18 +1238,13 @@ public class Simpletask extends ThemedListActivity implements
                     holder.taskthreshold.setText("");
                     holder.taskthreshold.setVisibility(View.GONE);
                 }
-            }
+
             return convertView;
         }
 
         @Override
         public int getItemViewType(int position) {
-            VisibleLine line = visibleLines.get(position);
-            if (line.header) {
                 return 0;
-            } else {
-                return 1;
-            }
         }
 
         @Override
@@ -1341,18 +1254,17 @@ public class Simpletask extends ThemedListActivity implements
 
         @Override
         public boolean isEmpty() {
-            return visibleLines.size() == 0;
+            return m_app.getFileStore().getCount() == 0;
         }
 
         @Override
         public boolean areAllItemsEnabled() {
-            return false;
+            return true;
         }
 
         @Override
         public boolean isEnabled(int position) {
-            VisibleLine line = visibleLines.get(position);
-            return !line.header;
+            return true;
         }
     }
 

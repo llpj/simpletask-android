@@ -77,17 +77,6 @@ class AppWidgetRemoteViewsFactory implements RemoteViewsService.RemoteViewsFacto
         if (!application.isAuthenticated()) {
             return;
         }
-        List<Task> tasks = application.getFileStore().getTasks(null)
-;        if (tasks==null) {
-            return;
-        }
-        for (Task t : mFilter.apply(tasks)) {
-            if (t.isVisible()) {
-                visibleTasks.add(t);
-            }
-        }
-        MultiComparator comp = new MultiComparator(mFilter.getSort(application.getDefaultSorts()));
-        Collections.sort(visibleTasks, comp);
     }
 
     @Override

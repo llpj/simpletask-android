@@ -49,7 +49,6 @@ public class FileStore  {
     private String mEol;
     private String mTodoName;
     private FileObserver m_observer;
-    private String activePath;
     private ArrayList<String> mLines;
     private ArrayList<Task> mTasks = new ArrayList<>();
     private ActiveFilter mActiveFilter;
@@ -61,6 +60,30 @@ public class FileStore  {
         mTodoName = fileName;
         m_observer = null;
         this.bm = LocalBroadcastManager.getInstance(ctx);
+        bm.sendBroadcast(new Intent(Constants.BROADCAST_SYNC_START));
+        new AsyncTask<String, Void, ArrayList<String>>() {
+            @Override
+            protected ArrayList<String> doInBackground(String... params) {
+                return TaskIo.loadFromFile(new File(mTodoName));
+            }
+
+            @Override
+            protected void onPostExecute(ArrayList<String> results) {
+                ArrayList<Task> parsedTasks= new ArrayList<Task>();
+                int lineNum = 0;
+                for (String line : results) {
+                    if (line.trim() == "") continue;
+                    parsedTasks.add(new Task(lineNum,line));
+                    lineNum ++;
+                }
+
+                mTasks = parsedTasks;
+                bm.sendBroadcast(new Intent(Constants.BROADCAST_SYNC_DONE));
+                bm.sendBroadcast(new Intent(Constants.BROADCAST_UPDATE_UI));
+
+            }
+        }.execute(mTodoName);
+        startWatching(mTodoName);
     }
 
     public boolean isAuthenticated() {
@@ -93,39 +116,6 @@ public class FileStore  {
 
     public boolean supportsSync() {
         return false;
-    }
-
-    public boolean setFile (final String path) {
-        if (activePath != null && activePath.equals(path) && mLines != null) {
-            return true;
-        }
-
-        // Did we switch todo file?
-        if (!path.equals(activePath)) {
-            stopWatching(activePath);
-            startWatching(path);
-        }
-        mTodoName = path;
-
-        // Clear and reload cache
-        invalidateCache();
-        bm.sendBroadcast(new Intent(Constants.BROADCAST_SYNC_START));
-        new AsyncTask<String, Void, ArrayList<String>>() {
-            @Override
-            protected ArrayList<String> doInBackground(String... params) {
-                return TaskIo.loadFromFile(new File(path));
-            }
-
-            @Override
-            protected void onPostExecute(ArrayList<String> results) {
-                // Trigger update
-                activePath = path;
-                mLines = results;
-                bm.sendBroadcast(new Intent(Constants.BROADCAST_SYNC_DONE));
-                notifyFileChanged();
-            }
-        }.execute(path);
-        return true;
     }
 
 
@@ -237,25 +227,27 @@ public class FileStore  {
             @Override
             protected void onPostExecute(ArrayList<String> lines) {
                 updateDone(mTodoName);
+                bm.sendBroadcast(new Intent(Constants.BROADCAST_FILE_CHANGED));
                 mLines = lines;
             }
         }.execute();
     }
 
 
-    public int getLines() {
-        if (mLines != null) {
-            return mLines.size();
+    public int getCount() {
+        if (mTasks != null) {
+            return mTasks.size();
         } else {
+            get(null,0);
             return 0;
         }
     }
 
 
-    public List<Task> getTasks(ActiveFilter filter) {
+    public Task get(ActiveFilter filter, int i) {
 
         if (mActiveFilter == filter && filter != null) {
-            return mFilteredTasks;
+            return mFilteredTasks.get(i);
         } else {
             mFilteredTasks = new ArrayList<Task>();
         }
@@ -268,11 +260,11 @@ public class FileStore  {
             }
         }
         if (filter==null) {
-            return mTasks;
+            return mTasks.get(i);
         }
 
         mFilteredTasks.addAll(filter.apply(mTasks));
-        return mFilteredTasks;
+        return mFilteredTasks.get(i);
     }
 
 

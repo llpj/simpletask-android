@@ -85,6 +85,8 @@ public class TodoApplication extends Application implements SharedPreferences.On
             public void onReceive(Context context, @NotNull Intent intent) {
                 if (intent.getAction().equals(Constants.BROADCAST_FILE_CHANGED)) {
                     // File changed
+                    mFileStore = new FileStore(m_appContext, getEol(),getTodoFileName());
+                    // localBroadcastManager.sendBroadcast(new Intent(Constants.BROADCAST_UPDATE_UI));
                 } else if (intent.getAction().equals(Constants.BROADCAST_UPDATE_UI)) {
                     updateWidgets();
                 }
@@ -423,7 +425,7 @@ public class TodoApplication extends Application implements SharedPreferences.On
                     @Override
                     public void fileSelected(String file) {
                         setTodoFile(file);
-                        getFileStore().setFile(file);
+                        mFileStore = new FileStore(m_appContext, getEol(), file);
                         localBroadcastManager.sendBroadcast(new Intent(Constants.BROADCAST_FILE_CHANGED));
                     }
                 },
