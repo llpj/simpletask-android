@@ -11,6 +11,7 @@ import android.os.Environment;
 import android.os.FileObserver;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
+import android.util.SparseArray;
 
 import java.io.File;
 import java.io.FilenameFilter;
@@ -21,30 +22,47 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 
+import nl.mpcjanssen.simpletask.ActiveFilter;
 import nl.mpcjanssen.simpletask.Constants;
 import nl.mpcjanssen.simpletask.TodoApplication;
+import nl.mpcjanssen.simpletask.task.Priority;
+import nl.mpcjanssen.simpletask.task.Task;
 import nl.mpcjanssen.simpletask.util.ListenerList;
 import nl.mpcjanssen.simpletask.util.TaskIo;
 import nl.mpcjanssen.simpletask.util.Util;
 
-public class FileStore implements FileStoreInterface {
+
+public class FileStore  {
+
+    public void deauthenticate() {
+
+    }
+
+    public interface FileSelectedListener {
+        void fileSelected(String file);
+    }
+
 
     private final String TAG = getClass().getSimpleName();
     private final Context mCtx;
     private final LocalBroadcastManager bm;
     private String mEol;
+    private String mTodoName;
     private FileObserver m_observer;
     private String activePath;
     private ArrayList<String> mLines;
+    private ArrayList<Task> mTasks = new ArrayList<>();
+    private ActiveFilter mActiveFilter;
+    private ArrayList<Task> mFilteredTasks;
 
-    public FileStore(Context ctx, String eol) {
+    public FileStore(Context ctx, String eol, String fileName) {
         mCtx = ctx;
         mEol = eol;
+        mTodoName = fileName;
         m_observer = null;
         this.bm = LocalBroadcastManager.getInstance(ctx);
     }
 
-    @Override
     public boolean isAuthenticated() {
         return true;
     }
@@ -54,35 +72,32 @@ public class FileStore implements FileStoreInterface {
         LocalBroadcastManager.getInstance(mCtx).sendBroadcast(new Intent(Constants.BROADCAST_UPDATE_UI));
     }
 
-    @Override
     public boolean isSyncing() {
         return false;
     }
 
-    @Override
     public void setEol(String eol) {
         mEol = eol;
     }
 
-    @Override
-    public void invalidateCache() {
+    private void invalidateCache() {
         mLines = null;
+        mTasks = new ArrayList<>();
+        mFilteredTasks = new ArrayList<>();
+        mActiveFilter = null;
     }
 
-    @Override
     public void sync() {
-        
+
     }
 
-    @Override
     public boolean supportsSync() {
         return false;
     }
 
-    @Override
-    public List<String> get(final String path) {
-        if (activePath != null && activePath.equals(path) && mLines!=null) {
-            return mLines;
+    public boolean setFile (final String path) {
+        if (activePath != null && activePath.equals(path) && mLines != null) {
+            return true;
         }
 
         // Did we switch todo file?
@@ -90,15 +105,17 @@ public class FileStore implements FileStoreInterface {
             stopWatching(activePath);
             startWatching(path);
         }
+        mTodoName = path;
 
         // Clear and reload cache
-        mLines = null;
+        invalidateCache();
         bm.sendBroadcast(new Intent(Constants.BROADCAST_SYNC_START));
         new AsyncTask<String, Void, ArrayList<String>>() {
             @Override
             protected ArrayList<String> doInBackground(String... params) {
                 return TaskIo.loadFromFile(new File(path));
             }
+
             @Override
             protected void onPostExecute(ArrayList<String> results) {
                 // Trigger update
@@ -108,17 +125,17 @@ public class FileStore implements FileStoreInterface {
                 notifyFileChanged();
             }
         }.execute(path);
-        return new ArrayList<String>();
+        return true;
     }
 
-    @Override
+
     public void archive(final String path, final List<String> lines) {
         updateStart(path);
         new AsyncTask<Void, Void, Void>() {
 
             @Override
             protected Void doInBackground(Void... params) {
-                append(path, Util.join(lines, mEol)+mEol);
+                append(path, Util.join(lines, mEol) + mEol);
                 return null;
             }
 
@@ -131,22 +148,21 @@ public class FileStore implements FileStoreInterface {
 
 
     private void append(String path, String data) {
-        TaskIo.writeToFile(data,new File(path),true);
+        TaskIo.writeToFile(data, new File(path), true);
     }
 
-    @Override
     public void startLogin(Activity caller, int i) {
 
     }
 
     private void startWatching(final String path) {
-        Log.v(TAG,"Observer adding on: " + new File(path).getParentFile().getAbsolutePath());
+        Log.v(TAG, "Observer adding on: " + new File(path).getParentFile().getAbsolutePath());
         final String folder = new File(path).getParentFile().getAbsolutePath();
         final String filename = new File(path).getName();
         m_observer = new FileObserver(folder) {
             @Override
             public void onEvent(int event, String eventPath) {
-                if (eventPath!=null && eventPath.equals(filename)) {
+                if (eventPath != null && eventPath.equals(filename)) {
                     // Log.v(TAG, "Observer event: " + eventPath + ":" + event);
                     if (event == FileObserver.CLOSE_WRITE ||
                             event == FileObserver.MODIFY ||
@@ -155,7 +171,7 @@ public class FileStore implements FileStoreInterface {
                         Log.v(TAG, "Observer " + path + " modified....sync done");
                         bm.sendBroadcast(new Intent(Constants.BROADCAST_SYNC_DONE));
                         bm.sendBroadcast(new Intent(Constants.BROADCAST_FILE_CHANGED));
-                        mLines=null;
+                        mLines = null;
                     }
                 }
             }
@@ -164,64 +180,57 @@ public class FileStore implements FileStoreInterface {
     }
 
     private void stopWatching(String path) {
-        if (m_observer!=null) {
-            Log.v(TAG,"Observer removing on: " + path);
+        if (m_observer != null) {
+            Log.v(TAG, "Observer removing on: " + path);
             m_observer.stopWatching();
             m_observer = null;
         }
     }
 
-
-    @Override
-    public void deauthenticate() {
-
-    }
-
-    @Override
-    public void browseForNewFile(Activity act, String path,  FileSelectedListener listener, boolean showTxt) {
+    public void browseForNewFile(Activity act, String path, FileSelectedListener listener, boolean showTxt) {
         FileDialog dialog = new FileDialog(act, new File(path).getParentFile(), showTxt);
         dialog.addFileListener(listener);
         dialog.createFileDialog();
     }
 
-    @Override
-    public void modify(final String mTodoName, final List<String> original,
-                       final List<String> updated,
-                       final List<String> added,
-                       final List<String> removed) {
+
+    public void modify(final List<Task> original,
+                       final List<Task> updated,
+                       final List<Task> added,
+                       final List<Task> removed) {
         final File file = new File(mTodoName);
 
         updateStart(mTodoName);
-        final int numUpdated = original!=null ? updated.size() : 0;
-        int numAdded = added!=null ? added.size() : 0;
-        int numRemoved = removed!=null ? removed.size() : 0;
+        final int numUpdated = original != null ? updated.size() : 0;
+        int numAdded = added != null ? added.size() : 0;
+        int numRemoved = removed != null ? removed.size() : 0;
         Log.v(TAG, "Modifying " + mTodoName
                 + " Updated: " + numUpdated
                 + ", added: " + numAdded
                 + ", removed: " + numRemoved);
 
-        new AsyncTask<Void,Void,ArrayList<String>>() {
+        new AsyncTask<Void, Void, ArrayList<String>>() {
             @Override
             protected ArrayList<String> doInBackground(Void... params) {
                 ArrayList<String> lines = TaskIo.loadFromFile(file);
-                for (int i=0 ; i<numUpdated;i++) {
+                for (int i = 0; i < numUpdated; i++) {
                     int index = lines.indexOf(original.get(i));
-                    if (index!=-1) {
+                    if (index != -1) {
                         lines.remove(index);
-                        lines.add(index,updated.get(i));
+                        lines.add(index, updated.get(i).getText());
                     }
                 }
-                if (added!=null) {
-                    for (String item : added) {
-                        lines.add(item);
+                if (added != null) {
+                    for (Task item : added) {
+                        lines.add(item.getText());
                     }
                 }
-                if (removed!=null) {
-                    for (String item : removed) {
-                        lines.remove(item);
+                if (removed != null) {
+                    for (Task item : removed) {
+                        lines.remove(item.getText());
                     }
                 }
-                TaskIo.writeToFile(Util.join(lines, mEol)+mEol, file, false);
+                TaskIo.writeToFile(Util.join(lines, mEol) + mEol, file, false);
                 return lines;
             }
 
@@ -231,6 +240,54 @@ public class FileStore implements FileStoreInterface {
                 mLines = lines;
             }
         }.execute();
+    }
+
+
+    public int getLines() {
+        if (mLines != null) {
+            return mLines.size();
+        } else {
+            return 0;
+        }
+    }
+
+
+    public List<Task> getTasks(ActiveFilter filter) {
+
+        if (mActiveFilter == filter && filter != null) {
+            return mFilteredTasks;
+        } else {
+            mFilteredTasks = new ArrayList<Task>();
+        }
+        if (mTasks == null ) {
+            ArrayList<Task> tasks = new ArrayList<>();
+            int lineNum = 0;
+            for (String line : mLines) {
+                tasks.add(new Task(lineNum,line));
+                lineNum++;
+            }
+        }
+        if (filter==null) {
+            return mTasks;
+        }
+
+        mFilteredTasks.addAll(filter.apply(mTasks));
+        return mFilteredTasks;
+    }
+
+
+    public List<String> getProjects() {
+        return null;
+    }
+
+    public List<Priority> getPriorities() {
+        return null;
+    }
+
+
+    public List<String> getContexts() {
+        // todo
+        return null;
     }
 
 
@@ -244,13 +301,13 @@ public class FileStore implements FileStoreInterface {
         startWatching(path);
     }
 
-    @Override
+
     public int getType() {
         return Constants.STORE_SDCARD;
     }
 
     public static String getDefaultPath() {
-        return Environment.getExternalStorageDirectory() +"/data/nl.mpcjanssen.simpletask/todo.txt";
+        return Environment.getExternalStorageDirectory() + "/data/nl.mpcjanssen.simpletask/todo.txt";
     }
 
     private class FileDialog {
@@ -268,8 +325,9 @@ public class FileStore implements FileStoreInterface {
          */
         public FileDialog(Activity activity, File path, boolean txtOnly) {
             this.activity = activity;
-            this.txtOnly=txtOnly;
-            if (!path.exists() || !path.isDirectory()) path = Environment.getExternalStorageDirectory();
+            this.txtOnly = txtOnly;
+            if (!path.exists() || !path.isDirectory())
+                path = Environment.getExternalStorageDirectory();
             loadFileList(path);
         }
 
@@ -330,7 +388,7 @@ public class FileStore implements FileStoreInterface {
                         if (!sel.canRead()) return false;
                         else {
                             boolean txtFile = filename.toLowerCase(Locale.getDefault()).endsWith(".txt");
-                            return !txtOnly ||  sel.isDirectory() || txtFile;
+                            return !txtOnly || sel.isDirectory() || txtFile;
                         }
                     }
                 };
@@ -347,7 +405,6 @@ public class FileStore implements FileStoreInterface {
         }
     }
 
-    @Override
     public boolean initialSyncDone() {
         return true;
     }

@@ -19,6 +19,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.List;
 
 import nl.mpcjanssen.simpletask.sort.MultiComparator;
 import nl.mpcjanssen.simpletask.task.Task;
@@ -76,12 +77,8 @@ class AppWidgetRemoteViewsFactory implements RemoteViewsService.RemoteViewsFacto
         if (!application.isAuthenticated()) {
             return;
         }
-        if (application.getTaskCache()==null)  {
-            Log.v(TAG, "taskcache object was null");
-            return;
-        }
-        ArrayList<Task> tasks = application.getTaskCache().getTasks();
-        if (tasks==null) {
+        List<Task> tasks = application.getFileStore().getTasks(null)
+;        if (tasks==null) {
             return;
         }
         for (Task t : mFilter.apply(tasks)) {

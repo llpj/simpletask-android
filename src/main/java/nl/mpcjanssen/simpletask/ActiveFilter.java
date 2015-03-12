@@ -17,6 +17,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.List;
 import java.util.TimeZone;
 
 import nl.mpcjanssen.simpletask.task.ByContextFilter;
@@ -329,7 +330,7 @@ public class ActiveFilter {
     }
 
     @NotNull
-    public ArrayList<Task> apply(@NotNull ArrayList<Task> tasks) {
+    public ArrayList<Task> apply(@NotNull List<Task> tasks) {
         AndFilter filter = new AndFilter();
         ArrayList<Task> matched = new ArrayList<Task>();
         Context context = Context.enter();

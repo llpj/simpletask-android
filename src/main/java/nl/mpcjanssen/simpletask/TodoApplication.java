@@ -49,8 +49,6 @@ import org.jetbrains.annotations.Nullable;
 import java.io.File;
 
 import nl.mpcjanssen.simpletask.remote.FileStore;
-import nl.mpcjanssen.simpletask.remote.FileStoreInterface;
-import nl.mpcjanssen.simpletask.task.TaskCache;
 import nl.mpcjanssen.simpletask.util.Util;
 
 
@@ -61,9 +59,8 @@ public class TodoApplication extends Application implements SharedPreferences.On
     private LocalBroadcastManager localBroadcastManager;
 
     @Nullable
-    private FileStoreInterface mFileStore;
-    @Nullable
-    private TaskCache m_taskCache;
+    private FileStore mFileStore;
+
     private BroadcastReceiver m_broadcastReceiver;
 
     public static Context getAppContext() {
@@ -87,8 +84,7 @@ public class TodoApplication extends Application implements SharedPreferences.On
             @Override
             public void onReceive(Context context, @NotNull Intent intent) {
                 if (intent.getAction().equals(Constants.BROADCAST_FILE_CHANGED)) {
-                    // File change reload task cache
-                    resetTaskCache();
+                    // File changed
                 } else if (intent.getAction().equals(Constants.BROADCAST_UPDATE_UI)) {
                     updateWidgets();
                 }
@@ -132,11 +128,11 @@ public class TodoApplication extends Application implements SharedPreferences.On
 
     public void sync() {
         if (mFileStore!=null) {
-            new AsyncTask<FileStoreInterface, Void, Void>() {
+            new AsyncTask<FileStore, Void, Void>() {
 
                 @Override
-                protected Void doInBackground(FileStoreInterface... params) {
-                    FileStoreInterface fs = params[0];
+                protected Void doInBackground(FileStore... params) {
+                    FileStore fs = params[0];
                     fs.sync();
                     return null;
                 }
@@ -284,20 +280,6 @@ public class TodoApplication extends Application implements SharedPreferences.On
                 .apply();
     }
 
-    public void resetTaskCache() {
-        m_taskCache = null;
-        getTaskCache();
-    }
-
-    @NotNull
-    public TaskCache getTaskCache() {
-        if (this.m_taskCache==null) {
-            this.m_taskCache = new TaskCache(this,
-                    getFileStore(),
-                    getTodoFileName());
-        }
-        return this.m_taskCache;
-    }
 
     public void fileUpdated() {
         localBroadcastManager.sendBroadcast(new Intent(Constants.BROADCAST_FILE_CHANGED));
@@ -390,9 +372,9 @@ public class TodoApplication extends Application implements SharedPreferences.On
     }
 
     @NotNull
-    synchronized private FileStoreInterface getFileStore() {
+    public FileStore getFileStore() {
         if (mFileStore==null) {
-            mFileStore = new FileStore(this, getEol());
+            mFileStore = new FileStore(this, getEol(), getTodoFileName());
         }
         return mFileStore;
     }
@@ -416,7 +398,7 @@ public class TodoApplication extends Application implements SharedPreferences.On
     }
 
     public boolean isAuthenticated() {
-        FileStoreInterface fs = getFileStore();
+        FileStore fs = getFileStore();
         return fs.isAuthenticated();
     }
 
@@ -429,7 +411,7 @@ public class TodoApplication extends Application implements SharedPreferences.On
     }
 
     public void browseForNewFile(@NotNull Activity act) {
-        FileStoreInterface fileStore = getFileStore();
+        FileStore fileStore = getFileStore();
         if (fileStore == null) {
             Util.showToastShort(act, "can't access filesystem");
             return;
@@ -437,11 +419,11 @@ public class TodoApplication extends Application implements SharedPreferences.On
         fileStore.browseForNewFile(
                 act,
                 getTodoFileName(),
-                new FileStoreInterface.FileSelectedListener() {
+                new FileStore.FileSelectedListener() {
                     @Override
                     public void fileSelected(String file) {
                         setTodoFile(file);
-                        getFileStore().invalidateCache();
+                        getFileStore().setFile(file);
                         localBroadcastManager.sendBroadcast(new Intent(Constants.BROADCAST_FILE_CHANGED));
                     }
                 },

@@ -300,7 +300,8 @@ public class Util {
 
     public static ArrayList<String> sortWithPrefix(List<String> items, boolean caseSensitive, String prefix) {
         ArrayList<String> result = new ArrayList<String>();
-        result.addAll(new AlphabeticalStringComparator(caseSensitive).sortedCopy(items));
+
+        // result.addAll(new AlphabeticalStringComparator(caseSensitive).sortedCopy(items));
         if (prefix !=null ) {
             result.add(0,prefix);
         }

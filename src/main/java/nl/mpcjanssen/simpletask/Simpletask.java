@@ -81,7 +81,6 @@ import hirondelle.date4j.DateTime;
 import nl.mpcjanssen.simpletask.adapters.DrawerAdapter;
 import nl.mpcjanssen.simpletask.task.Priority;
 import nl.mpcjanssen.simpletask.task.Task;
-import nl.mpcjanssen.simpletask.task.TaskCache;
 import nl.mpcjanssen.simpletask.task.token.Token;
 import nl.mpcjanssen.simpletask.util.DateStrings;
 import nl.mpcjanssen.simpletask.util.Strings;
@@ -379,7 +378,6 @@ public class Simpletask extends ThemedListActivity implements
             lv.setItemChecked(position, true);
             lv.setSelection(position);
         }
-
     }
 
     private void updateFilterBar() {
@@ -397,7 +395,7 @@ public class Simpletask extends ThemedListActivity implements
             actionbar.setVisibility(View.GONE);
         }
         int count = m_adapter!=null ? m_adapter.getCountVisbleTasks() : 0;
-        int total = getTaskBag()!=null ? getTaskBag().size() : 0;
+        int total = m_app.getFileStore()!=null ? m_app.getFileStore().getLines() : 0;
 
         filterText.setText(mFilter.getTitle(
                 count,
@@ -577,11 +575,12 @@ public class Simpletask extends ThemedListActivity implements
             public void onClick(@NotNull DialogInterface dialog, final int which) {
                 dialog.dismiss();
                 Priority prio = Priority.toPriority(prioArr[which]);
-                ArrayList<String> originalTasks = Util.tasksToString(tasks);
+                ArrayList<Task> originalTasks = new ArrayList<>();
+                originalTasks.addAll(tasks);
                 for (Task t : tasks) {
                     t.setPriority(prio);
                 }
-                getTaskBag().modify(originalTasks,tasks,null,null);
+                m_app.getFileStore().modify(originalTasks, tasks, null, null);
                 finishActionmode();
             }
         });
@@ -590,14 +589,11 @@ public class Simpletask extends ThemedListActivity implements
     }
 
     private void completeTasks(@NotNull List<Task> tasks) {
-        getTaskBag().complete(tasks, m_app.hasRecurOriginalDates(), m_app.hasKeepPrio());
-        if (m_app.isAutoArchive()) {
-            archiveTasks(null);
-        }
+        //todo
     }
 
     private void undoCompleteTasks(@NotNull List<Task> tasks) {
-        getTaskBag().undoComplete(tasks);
+        // todo
     }
 
     private void deferTasks(List<Task> tasks, final int dateType) {
@@ -617,7 +613,7 @@ public class Simpletask extends ThemedListActivity implements
                             month++;
 
                             DateTime date = DateTime.forDateOnly(year, month, day);
-                            getTaskBag().defer(date.format(Constants.DATE_FORMAT), tasksToDefer, dateType);
+                            // getTaskBag().defer(date.format(Constants.DATE_FORMAT), tasksToDefer, dateType);
 
                         }
                     },
@@ -631,7 +627,7 @@ public class Simpletask extends ThemedListActivity implements
                     dialog.getDatePicker().setSpinnersShown(!showCalendar);
                     dialog.show();
                 } else {
-                    getTaskBag().defer(selected, tasksToDefer, dateType);
+                    // getTaskBag().defer(selected, tasksToDefer, dateType);
                 }
             }
         });
@@ -642,14 +638,14 @@ public class Simpletask extends ThemedListActivity implements
         m_app.showConfirmationDialog(this, R.string.delete_task_message, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialogInterface, int i) {
-                m_app.getTaskCache().modify(null,null,null,tasks);
+                m_app.getFileStore().modify(null,null,null,tasks);
                 // We have change the data, views should refresh
             }
         }, R.string.delete_task_title);
     }
 
     private void archiveTasks(final List<Task> tasksToArchive) {
-        getTaskBag().archive(m_app.getDoneFileName(), tasksToArchive);
+        // m_app.getFileStore().archive(tasksToArchive);
     }
 
     @Override
@@ -695,7 +691,6 @@ public class Simpletask extends ThemedListActivity implements
 
     private void startAddTaskActivity(List<Task> tasks) {
         Log.v(TAG, "Starting addTask activity");
-        getTaskBag().setTasksToUpdate(tasks);
         Intent intent = new Intent(this, AddTask.class);
         mFilter.saveInIntent(intent);
         startActivity(intent);
@@ -988,9 +983,11 @@ public class Simpletask extends ThemedListActivity implements
 
 
     private void updateLeftDrawer() {
-        TaskCache taskBag = getTaskBag();
-        ArrayList<String> decoratedContexts = Util.sortWithPrefix(taskBag.getDecoratedContexts(), m_app.sortCaseSensitive(), "@-");
-        ArrayList<String> decoratedProjects = Util.sortWithPrefix(taskBag.getDecoratedProjects(), m_app.sortCaseSensitive(), "+-");
+
+        ArrayList<String> decoratedContexts = new ArrayList<>();
+        // Util.sortWithPrefix(taskBag.getDecoratedContexts(), m_app.sortCaseSensitive(), "@-");
+        ArrayList<String> decoratedProjects = new ArrayList<>();
+                // Util.sortWithPrefix(taskBag.getDecoratedProjects(), m_app.sortCaseSensitive(), "+-");
         DrawerAdapter drawerAdapter = new DrawerAdapter(getLayoutInflater(),
 							getString(R.string.context_prompt),
 							decoratedContexts,
@@ -1016,10 +1013,6 @@ public class Simpletask extends ThemedListActivity implements
         }
         m_leftDrawerList.setItemChecked(drawerAdapter.getContextHeaderPosition(), mFilter.getContextsNot());
         m_leftDrawerList.setItemChecked(drawerAdapter.getProjectsHeaderPosition(), mFilter.getProjectsNot());
-    }
-
-    private TaskCache getTaskBag() {
-        return m_app.getTaskCache();
     }
 
     public void startFilterActivity() {
@@ -1088,11 +1081,11 @@ public class Simpletask extends ThemedListActivity implements
         }
 
         void setFilteredTasks() {
-            ArrayList<Task> visibleTasks;
+            ArrayList<Task> visibleTasks = new ArrayList<>();
             countVisbleTasks = 0;
-            Log.v(TAG, "setFilteredTasks called: " + getTaskBag());
+            Log.v(TAG, "setFilteredTasks called");
             ArrayList<String> sorts = mFilter.getSort(m_app.getDefaultSorts());
-            visibleTasks = getTaskBag().getTasks(mFilter, sorts);
+            visibleTasks.addAll(m_app.getFileStore().getTasks(mFilter));
             visibleLines.clear();
 
             String header = "";
@@ -1531,8 +1524,7 @@ public class Simpletask extends ThemedListActivity implements
     private void updateLists(@NotNull final List<Task> checkedTasks) {
         final ArrayList<String> contexts = new ArrayList<String>();
         Set<String> selectedContexts = new HashSet<String>();
-        final TaskCache taskbag = getTaskBag();
-        contexts.addAll(Util.sortWithPrefix(taskbag.getContexts(), m_app.sortCaseSensitive(), null));
+        contexts.addAll(Util.sortWithPrefix(m_app.getFileStore().getContexts(), m_app.sortCaseSensitive(), null));
         for (Task t : checkedTasks) {
             selectedContexts.addAll(t.getLists());
         }
@@ -1561,8 +1553,7 @@ public class Simpletask extends ThemedListActivity implements
         builder.setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
-                ArrayList<String> originalLines = new ArrayList<String>();
-                originalLines.addAll(Util.tasksToString(getCheckedTasks()));
+
                 ArrayList<String> items = new ArrayList<String>();
                 ArrayList<String> uncheckedItesm = new ArrayList<String>();
                 uncheckedItesm.addAll(Util.getCheckedItems(lv, false));
@@ -1582,8 +1573,8 @@ public class Simpletask extends ThemedListActivity implements
                     }
                 }
                 finishActionmode();
-                m_app.getTaskCache().modify(
-                        originalLines,
+                m_app.getFileStore().modify(
+                        getCheckedTasks(),
                         checkedTasks,
                         null,
                         null
@@ -1604,8 +1595,8 @@ public class Simpletask extends ThemedListActivity implements
     private void updateTags(@NotNull final List<Task> checkedTasks) {
         final ArrayList<String> projects = new ArrayList<String>();
         Set<String> selectedProjects = new HashSet<String>();
-        final TaskCache taskbag = getTaskBag();
-        projects.addAll(Util.sortWithPrefix(taskbag.getProjects(), m_app.sortCaseSensitive(), null));
+
+        projects.addAll(Util.sortWithPrefix(m_app.getFileStore().getProjects(), m_app.sortCaseSensitive(), null));
         for (Task t : checkedTasks) {
             selectedProjects.addAll(t.getTags());
         }
@@ -1653,8 +1644,8 @@ public class Simpletask extends ThemedListActivity implements
                     }
                 }
                 finishActionmode();
-                m_app.getTaskCache().modify(
-                        originalLines,
+                m_app.getFileStore().modify(
+                        getCheckedTasks(),
                         checkedTasks,
                         null,
                         null
