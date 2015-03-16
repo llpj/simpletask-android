@@ -30,6 +30,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.provider.CalendarContract;
 import android.provider.CalendarContract.Events;
+import android.support.multidex.MultiDexApplication;
 import android.support.v4.app.ActionBarDrawerToggle;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.view.MenuItemCompat;
@@ -198,7 +199,7 @@ public class Simpletask extends ThemedListActivity implements
     @Override
     public void onCreate(Bundle savedInstanceState) {
         Log.v(TAG, "onCreate");
-        m_app = (TodoApplication) getApplication();
+        m_app = (TodoApplication) getApplicationContext();
         m_app.setActionBarStyle(getWindow());
         m_savedInstanceState = savedInstanceState;
 

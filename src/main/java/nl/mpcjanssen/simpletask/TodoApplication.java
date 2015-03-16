@@ -38,6 +38,7 @@ import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
 import android.os.AsyncTask;
 import android.preference.PreferenceManager;
+import android.support.multidex.MultiDexApplication;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 import android.view.Window;
@@ -54,7 +55,7 @@ import nl.mpcjanssen.simpletask.task.TaskCache;
 import nl.mpcjanssen.simpletask.util.Util;
 
 
-public class TodoApplication extends Application implements SharedPreferences.OnSharedPreferenceChangeListener {
+public class TodoApplication extends MultiDexApplication implements SharedPreferences.OnSharedPreferenceChangeListener {
     private final static String TAG = TodoApplication.class.getSimpleName();
         private static Context m_appContext;
     private static SharedPreferences m_prefs;

@@ -190,7 +190,9 @@ public class Preferences extends ThemedActivity {
 
 			} else if (preference.getKey().equals("send_log")) {
                 sendLog();
-            } 
+            } else if (preference.getKey().equals("scala")) {
+                startActivity(new Intent(this.getActivity(),GreetingActivity.class));
+            }
 			return false;
 		}
 	}
