@@ -27,6 +27,7 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Application;
 import android.support.multidex.MultiDexApplication;
+import android.support.multidex.MultiDex;
 import android.app.Dialog;
 import android.appwidget.AppWidgetManager;
 import android.content.BroadcastReceiver;
@@ -69,6 +70,11 @@ public class TodoApplication extends MultiDexApplication implements SharedPrefer
 
     public static Context getAppContext() {
         return m_appContext;
+    }
+
+    protected void attachBaseContext(Context base) {
+        super.attachBaseContext(base);
+        MultiDex.install(this);
     }
 
     public static SharedPreferences getPrefs() {
