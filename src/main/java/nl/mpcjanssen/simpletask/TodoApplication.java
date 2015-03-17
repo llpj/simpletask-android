@@ -26,6 +26,7 @@ package nl.mpcjanssen.simpletask;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Application;
+import android.support.multidex.MultiDexApplication;
 import android.app.Dialog;
 import android.appwidget.AppWidgetManager;
 import android.content.BroadcastReceiver;
@@ -54,7 +55,7 @@ import nl.mpcjanssen.simpletask.task.TaskCache;
 import nl.mpcjanssen.simpletask.util.Util;
 
 
-public class TodoApplication extends Application implements SharedPreferences.OnSharedPreferenceChangeListener {
+public class TodoApplication extends MultiDexApplication implements SharedPreferences.OnSharedPreferenceChangeListener {
     private final static String TAG = TodoApplication.class.getSimpleName();
         private static Context m_appContext;
     private static SharedPreferences m_prefs;
