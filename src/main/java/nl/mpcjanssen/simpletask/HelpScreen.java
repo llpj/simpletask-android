@@ -56,7 +56,7 @@ public class HelpScreen extends Activity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        TodoApplication m_app = (TodoApplication) getApplication();
+        SimpletaskApplication m_app = (SimpletaskApplication) getApplication();
         setTheme(m_app.getActiveTheme());
         String page = Constants.HELP_INDEX;
         Intent i = getIntent();

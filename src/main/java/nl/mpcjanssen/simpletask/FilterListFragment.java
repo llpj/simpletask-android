@@ -91,7 +91,7 @@ public class FilterListFragment extends Fragment {
 
         cb.setChecked(not);
 
-        gestureDetector = new GestureDetector(TodoApplication.getAppContext(),
+        gestureDetector = new GestureDetector(SimpletaskApplication.getAppContext(),
                 new FilterGestureDetector());
         OnTouchListener gestureListener = new OnTouchListener() {
             @Override

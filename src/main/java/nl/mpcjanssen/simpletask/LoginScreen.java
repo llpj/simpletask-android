@@ -38,7 +38,7 @@ public class LoginScreen extends Activity {
 
     final static String TAG = LoginScreen.class.getSimpleName();
 
-    private TodoApplication m_app;
+    private SimpletaskApplication m_app;
     private BroadcastReceiver m_broadcastReceiver;
     private LocalBroadcastManager localBroadcastManager;
 
@@ -46,7 +46,7 @@ public class LoginScreen extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        m_app = (TodoApplication) getApplication();
+        m_app = (SimpletaskApplication) getApplication();
         setTheme(m_app.getActiveTheme());
         setContentView(R.layout.login);
         localBroadcastManager = LocalBroadcastManager.getInstance(this);

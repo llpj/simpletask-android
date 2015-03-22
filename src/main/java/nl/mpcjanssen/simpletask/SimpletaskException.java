@@ -22,15 +22,15 @@
  */
 package nl.mpcjanssen.simpletask;
 
-public class TodoException extends RuntimeException {
+public class SimpletaskException extends RuntimeException {
 
 	private static final long serialVersionUID = 2160630991596963352L;
 
-	public TodoException(String msg) {
+	public SimpletaskException(String msg) {
 		super(msg);
 	}
 
-	public TodoException(String msg, Throwable t) {
+	public SimpletaskException(String msg, Throwable t) {
 		super(msg, t);
 	}
 

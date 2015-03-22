@@ -7,7 +7,7 @@ abstract class ThemedActivity extends Activity {
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
-        TodoApplication app = (TodoApplication) getApplication();
+        SimpletaskApplication app = (SimpletaskApplication) getApplication();
         setTheme(app.getActiveTheme());
         setTheme(app.getActiveFont());
         super.onCreate(savedInstanceState);

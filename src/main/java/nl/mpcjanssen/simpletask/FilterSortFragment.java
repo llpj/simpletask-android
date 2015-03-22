@@ -39,7 +39,7 @@ public class FilterSortFragment extends Fragment {
     int sortUpId;
     int sortDownId;
 
-    TodoApplication m_app;
+    SimpletaskApplication m_app;
 
     @NotNull
     private DragSortListView.DropListener onDrop =
@@ -91,7 +91,7 @@ public class FilterSortFragment extends Fragment {
             }
         }
         Log.v(TAG, "Created view with: " + originalItems);
-        m_app = (TodoApplication) getActivity().getApplication();
+        m_app = (SimpletaskApplication) getActivity().getApplication();
 
         // Set the proper theme
         if (m_app.isDarkTheme()) {

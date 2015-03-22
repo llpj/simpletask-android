@@ -8,7 +8,7 @@ abstract class ThemedListActivity extends ListActivity {
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
-        TodoApplication app = (TodoApplication) getApplication();
+        SimpletaskApplication app = (SimpletaskApplication) getApplication();
         setTheme(app.getActiveTheme());
         setTheme(app.getActiveFont());
         requestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);

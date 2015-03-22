@@ -45,7 +45,7 @@ import org.jetbrains.annotations.NotNull;
 import nl.mpcjanssen.simpletask.util.Util;
 
 public class Preferences extends ThemedActivity {
-    static TodoApplication m_app ;
+    static SimpletaskApplication m_app ;
     final static String TAG = Preferences.class.getSimpleName();
 	public static final int RESULT_LOGOUT = RESULT_FIRST_USER + 1;
 	public static final int RESULT_ARCHIVE = RESULT_FIRST_USER + 2;
@@ -89,7 +89,7 @@ public class Preferences extends ThemedActivity {
 			} catch (NameNotFoundException e) {
 				e.printStackTrace();
 			}
-            m_app = (TodoApplication)getActivity().getApplication();
+            m_app = (SimpletaskApplication)getActivity().getApplication();
             if (m_app.storeType() != Constants.STORE_DROPBOX) {
                 PreferenceCategory dropboxCategory = (PreferenceCategory) findPreference(getString(R.string.dropbox_cat_key));
                 getPreferenceScreen().removePreference(dropboxCategory);

@@ -22,7 +22,7 @@ import java.util.List;
 import java.util.Locale;
 
 import nl.mpcjanssen.simpletask.Constants;
-import nl.mpcjanssen.simpletask.TodoApplication;
+import nl.mpcjanssen.simpletask.SimpletaskApplication;
 import nl.mpcjanssen.simpletask.util.ListenerList;
 import nl.mpcjanssen.simpletask.util.TaskIo;
 import nl.mpcjanssen.simpletask.util.Util;
