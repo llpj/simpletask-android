@@ -52,11 +52,6 @@ task buildInfo {
     ext.branch = branchproc.text.trim()
 }
 
-// Check if all changes are commited to Git. If not throw an exception.
-// This is called before deploying apk's. It will ensure that the Git revision numbers in the apk names
-// and in the app settings are accurate. If there were uncommited changes, the result would be different from
-// a clean checkout.
-
 task checkCleanGit {
     def cmd = "git diff-files"
     def proc = cmd.execute()
@@ -74,7 +69,7 @@ def checkDeployPath() {
         return null
 }
 
-task deploy(type:Sync, dependsOn: [clean,build]) {
+task deploy(type:Sync, dependsOn: [clean,build,checkCleanGit]) {
   doFirst {
     if (checkDeployPath()==null)
       throw new GradleException("deployPath not defined, please define it in gradle.properties")
