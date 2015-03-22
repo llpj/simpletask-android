@@ -110,7 +110,7 @@ public class FilterScriptFragment extends Fragment {
             txtTestTask.setText(arguments.getString(ActiveFilter.INTENT_JAVASCRIPT_TEST_TASK_FILTER,""));
         }
 
-        gestureDetector = new GestureDetector(TodoApplication.getAppContext(),
+        gestureDetector = new GestureDetector(SimpletaskApplication.getAppContext(),
                 new FilterGestureDetector());
         OnTouchListener gestureListener = new OnTouchListener() {
             @Override

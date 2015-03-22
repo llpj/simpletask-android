@@ -32,7 +32,7 @@ public class AppWidgetService extends RemoteViewsService {
     
     @Override
     public RemoteViewsFactory onGetViewFactory( Intent intent) {
-	    return new AppWidgetRemoteViewsFactory((TodoApplication)getApplication(), intent);
+	    return new AppWidgetRemoteViewsFactory((SimpletaskApplication)getApplication(), intent);
     }
 }
 
@@ -42,14 +42,14 @@ class AppWidgetRemoteViewsFactory implements RemoteViewsService.RemoteViewsFacto
     private ActiveFilter mFilter;
 
     private Context mContext;
-    private TodoApplication application;
+    private SimpletaskApplication application;
     
     ArrayList<Task> visibleTasks = new ArrayList<Task>();
 
-    public AppWidgetRemoteViewsFactory(TodoApplication application,  Intent intent) {
+    public AppWidgetRemoteViewsFactory(SimpletaskApplication application,  Intent intent) {
         int widgetId = intent.getIntExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, -1);
         Log.v(TAG, "Creating view for widget: " + widgetId);
-        mContext = TodoApplication.getAppContext();
+        mContext = SimpletaskApplication.getAppContext();
         SharedPreferences preferences = mContext.getSharedPreferences("" + widgetId, 0);
         mFilter = new ActiveFilter();
         mFilter.initFromPrefs(preferences);
@@ -130,7 +130,7 @@ class AppWidgetRemoteViewsFactory implements RemoteViewsService.RemoteViewsFacto
             SpannableString ss = new SpannableString(
                     task.showParts(tokensToShow).trim());
 
-            if (TodoApplication.getPrefs().getString("widget_theme", "").equals("android.R.style.Theme_Holo")) {
+            if (SimpletaskApplication.getPrefs().getString("widget_theme", "").equals("android.R.style.Theme_Holo")) {
                 rv.setTextColor(R.id.tasktext, application.getResources().getColor(android.R.color.white));
             } else {
                 rv.setTextColor(R.id.tasktext, application.getResources().getColor(android.R.color.black));
@@ -225,7 +225,7 @@ class AppWidgetRemoteViewsFactory implements RemoteViewsService.RemoteViewsFacto
             ss.setSpan(new StrikethroughSpan(), 0, ss.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
         }
         rv.setTextViewText(R.id.widget_item_text, ss);
-        if (TodoApplication.getPrefs().getString("widget_theme", "").equals("android.R.style.Theme_Holo")) {
+        if (SimpletaskApplication.getPrefs().getString("widget_theme", "").equals("android.R.style.Theme_Holo")) {
             rv.setTextColor(R.id.widget_item_text, application.getResources().getColor(android.R.color.white));
         } else {
             rv.setTextColor(R.id.widget_item_text, application.getResources().getColor(android.R.color.black));
@@ -245,7 +245,7 @@ class AppWidgetRemoteViewsFactory implements RemoteViewsService.RemoteViewsFacto
         }
 
         RemoteViews rv;
-        boolean extended_widget = TodoApplication.getPrefs().getBoolean("widget_extended", true);
+        boolean extended_widget = SimpletaskApplication.getPrefs().getBoolean("widget_extended", true);
         if (extended_widget) {
             rv = getExtendedView(position);
         } else {

@@ -80,7 +80,7 @@ public class FilterOtherFragment extends Fragment {
             cbHideTags.setChecked(!arguments.getBoolean(ActiveFilter.INTENT_HIDE_TAGS_FILTER, false));
         }
 
-        gestureDetector = new GestureDetector(TodoApplication.getAppContext(),
+        gestureDetector = new GestureDetector(SimpletaskApplication.getAppContext(),
                 new FilterGestureDetector());
         OnTouchListener gestureListener = new OnTouchListener() {
             @Override

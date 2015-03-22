@@ -27,8 +27,6 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
-import android.content.Intent;
-import android.net.Uri;
 import android.text.Spannable;
 import android.text.SpannableString;
 import android.text.style.ForegroundColorSpan;
@@ -59,7 +57,7 @@ import java.util.regex.Pattern;
 import hirondelle.date4j.DateTime;
 import nl.mpcjanssen.simpletask.Constants;
 import nl.mpcjanssen.simpletask.R;
-import nl.mpcjanssen.simpletask.TodoException;
+import nl.mpcjanssen.simpletask.SimpletaskException;
 import nl.mpcjanssen.simpletask.sort.AlphabeticalStringComparator;
 import nl.mpcjanssen.simpletask.task.Task;
 import nl.mpcjanssen.simpletask.task.token.Token;
@@ -99,9 +97,9 @@ public class Util {
         void onClick(String input);
     }
 
-    public static void createParentDirectory(@Nullable File dest) throws TodoException {
+    public static void createParentDirectory(@Nullable File dest) throws SimpletaskException {
         if (dest == null) {
-            throw new TodoException("createParentDirectory: dest is null");
+            throw new SimpletaskException("createParentDirectory: dest is null");
         }
         File dir = dest.getParentFile();
         if (dir != null && !dir.exists()) {
@@ -109,7 +107,7 @@ public class Util {
             if (!dir.exists()) {
                 if (!dir.mkdirs()) {
                     Log.e(TAG, "Could not create dirs: " + dir.getAbsolutePath());
-                    throw new TodoException("Could not create dirs: "
+                    throw new SimpletaskException("Could not create dirs: "
                             + dir.getAbsolutePath());
                 }
             }

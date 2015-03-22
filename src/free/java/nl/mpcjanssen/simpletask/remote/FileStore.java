@@ -33,7 +33,7 @@ import java.util.List;
 
 import nl.mpcjanssen.simpletask.Constants;
 import nl.mpcjanssen.simpletask.R;
-import nl.mpcjanssen.simpletask.TodoException;
+import nl.mpcjanssen.simpletask.SimpletaskException;
 import nl.mpcjanssen.simpletask.util.ListenerList;
 import nl.mpcjanssen.simpletask.util.Strings;
 import nl.mpcjanssen.simpletask.util.Util;
@@ -89,7 +89,7 @@ public class FileStore implements FileStoreInterface {
                 return mDbxFs;
             } catch (IOException e) {
                 e.printStackTrace();
-                throw new TodoException("Dropbox", e);
+                throw new SimpletaskException("Dropbox", e);
             }
         }
         return null;
@@ -424,7 +424,7 @@ public class FileStore implements FileStoreInterface {
                         openFile.writeString(Util.join(contents, mEol)+mEol);
                     } catch (IOException e) {
                         e.printStackTrace();
-                        throw new TodoException("Dropbox", e);
+                        throw new SimpletaskException("Dropbox", e);
                     }
                 }
                 return null;

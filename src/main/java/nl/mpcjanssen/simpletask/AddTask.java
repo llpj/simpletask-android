@@ -81,7 +81,7 @@ public class AddTask extends ThemedActivity {
     private final static String TAG = AddTask.class.getSimpleName();
 
     private List<Task> m_backup;
-    private TodoApplication m_app;
+    private SimpletaskApplication m_app;
 
     private String share_text;
 
@@ -238,7 +238,7 @@ public class AddTask extends ThemedActivity {
     public void onCreate(Bundle savedInstanceState) {
         Log.v(TAG, "onCreate()");
 
-        m_app = (TodoApplication) getApplication();
+        m_app = (SimpletaskApplication) getApplication();
         m_app.setActionBarStyle(getWindow());
         requestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
         super.onCreate(savedInstanceState);

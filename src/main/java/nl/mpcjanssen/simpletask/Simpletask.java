@@ -98,7 +98,7 @@ public class Simpletask extends ThemedListActivity implements
     private final static int REQUEST_PREFERENCES = 2;
 
     Menu options_menu;
-    TodoApplication m_app;
+    SimpletaskApplication m_app;
     ActiveFilter mFilter;
     TaskAdapter m_adapter;
     private BroadcastReceiver m_broadcastReceiver;
@@ -199,7 +199,7 @@ public class Simpletask extends ThemedListActivity implements
     @Override
     public void onCreate(Bundle savedInstanceState) {
         Log.v(TAG, "onCreate");
-        m_app = (TodoApplication) getApplicationContext();
+        m_app = (SimpletaskApplication) getApplicationContext();
         m_app.setActionBarStyle(getWindow());
         m_savedInstanceState = savedInstanceState;
 
@@ -327,11 +327,11 @@ public class Simpletask extends ThemedListActivity implements
             mFilter.initFromIntent(intent);
             Log.v(TAG, "handleIntent: launched with filter" + mFilter);
             Log.v(TAG, "handleIntent: saving filter in prefs");
-            mFilter.saveInPrefs(TodoApplication.getPrefs());
+            mFilter.saveInPrefs(SimpletaskApplication.getPrefs());
         } else {
             // Set previous filters and sort
             Log.v(TAG, "handleIntent: from m_prefs state");
-            mFilter.initFromPrefs(TodoApplication.getPrefs());
+            mFilter.initFromPrefs(SimpletaskApplication.getPrefs());
         }
 
         // Initialize Adapter
@@ -497,7 +497,7 @@ public class Simpletask extends ThemedListActivity implements
                         mFilter = new ActiveFilter();
                     }
                     mFilter.setSearch(newText);
-                    mFilter.saveInPrefs(TodoApplication.getPrefs());
+                    mFilter.saveInPrefs(SimpletaskApplication.getPrefs());
                     if (m_adapter!=null) {
                         m_adapter.setFilteredTasks();
                     }
@@ -819,7 +819,7 @@ public class Simpletask extends ThemedListActivity implements
         Intent intent = new Intent();
         mFilter.clear();
         mFilter.saveInIntent(intent);
-        mFilter.saveInPrefs(TodoApplication.getPrefs());
+        mFilter.saveInPrefs(SimpletaskApplication.getPrefs());
         setIntent(intent);
         finishActionmode();
         updateDrawers();
@@ -851,7 +851,7 @@ public class Simpletask extends ThemedListActivity implements
                 Intent intent = getIntent();
                 mFilter.saveInIntent(intent);
                 setIntent(intent);
-                mFilter.saveInPrefs(TodoApplication.getPrefs());
+                mFilter.saveInPrefs(SimpletaskApplication.getPrefs());
                 m_adapter.setFilteredTasks();
                 if (m_drawerLayout != null) {
                     m_drawerLayout.closeDrawer(Gravity.RIGHT);
@@ -1300,7 +1300,7 @@ public class Simpletask extends ThemedListActivity implements
                     });
                 }
 
-                Context mContext = TodoApplication.getAppContext();
+                Context mContext = SimpletaskApplication.getAppContext();
 
                 String relAge = task.getRelativeAge(mContext);
                 SpannableString relDue = task.getRelativeDueDate(mContext, res.getColor(android.R.color.holo_green_light),
@@ -1704,7 +1704,7 @@ public class Simpletask extends ThemedListActivity implements
             }
             Intent intent = getIntent();
             mFilter.saveInIntent(intent);
-            mFilter.saveInPrefs(TodoApplication.getPrefs());
+            mFilter.saveInPrefs(SimpletaskApplication.getPrefs());
             setIntent(intent);
             finishActionmode();
             m_adapter.setFilteredTasks();
