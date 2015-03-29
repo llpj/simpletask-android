@@ -3,6 +3,7 @@
 This file is part of Todo.txt Touch, an Android app for managing your todo.txt file (http://todotxt.com).
 
 Copyright (c) 2009-2012 Todo.txt contributors (http://todotxt.com)
+Copyright (c) 2015 Vojtech Kral
 
 LICENSE:
 
@@ -21,6 +22,7 @@ You should have received a copy of the GNU General Public License along with Tod
 @license http://www.gnu.org/licenses/gpl.html
 @copyright 2009-2012 Todo.txt contributors (http://todotxt.com)
 @copyright 2013 Mark Janssen
+@copyright 2015 Vojtech Kral
 -->
 <!--suppress ALL -->
 <resources>
@@ -137,6 +139,13 @@ You should have received a copy of the GNU General Public License along with Tod
 
     <string name="show_txt_only_pref_title">Show txt files only</string>
     <string name="show_txt_only_summary">Only show .txt files in the file selection dialog.</string>
+
+    <string name="calendar_sync_screen_title">Calendar reminders</string>
+    <string name="calendar_sync_screen_summary">Automatically create calendar reminders for due and/or threshold dates.</string>
+    <string name="calendar_sync_dues_title">Due dates</string>
+    <string name="calendar_sync_thresholds_title">Threshold dates</string>
+    <string name="calendar_reminder_days_title">Reminders margin</string>
+    <string name="calendar_reminder_days_summary">How many days before the due/threshold date should the reminder be set.</string>
 
     <string name="drawer_fixed_landscape_title">Open landscape drawers</string>
     <string name="drawer_fixed_landscape_summary">Always open the drawers in landscape mode.</string>
@@ -327,4 +336,10 @@ You should have received a copy of the GNU General Public License along with Tod
     <string name="donate_summary">Donate if you like simpletask. NOTE: Donation is voluntary, simpletask will always be free.  </string>
     <string name="visit_donate_data">https://bitly.com/VYR7Fq</string>
     <string name="sort_reverse">Reverse sort</string>
+
+    <!-- Calendar sync -->
+    <string name="calendar_disp_name">Simpletask Reminders</string>
+    <string name="calendar_sync_prefix_due">Task due:</string>
+    <string name="calendar_sync_prefix_thre">Task threshold:</string>
+    <string name="calendar_sync_evt_desc">Generated automatically by Simpletask</string>
 </resources>

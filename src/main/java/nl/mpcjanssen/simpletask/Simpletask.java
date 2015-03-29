@@ -4,6 +4,7 @@
  * @license http://www.gnu.org/licenses/gpl.html
  * @copyright 2009-2012 Todo.txt contributors (http://todotxt.com)
  * @copyright 2013- Mark Janssen
+ * @copyright 2015 Vojtech Kral
  */
 
 package nl.mpcjanssen.simpletask;
@@ -96,6 +97,9 @@ public class Simpletask extends ThemedListActivity implements
     final static String TAG = Simpletask.class.getSimpleName();
 
     private final static int REQUEST_PREFERENCES = 2;
+
+    public final static Uri URI_BASE = Uri.fromParts("simpletask", "", null);
+    public final static Uri URI_SEARCH = Uri.withAppendedPath(URI_BASE, "search");
 
     Menu options_menu;
     SimpletaskApplication m_app;
@@ -805,6 +809,10 @@ public class Simpletask extends ThemedListActivity implements
             currentIntent.putExtra(SearchManager.QUERY, intent.getStringExtra(SearchManager.QUERY));
             setIntent(currentIntent);
             options_menu.findItem(R.id.search).collapseActionView();
+        } else if (CalendarContract.ACTION_HANDLE_CUSTOM_EVENT.equals(intent.getAction())) {
+            Uri uri = Uri.parse(intent.getStringExtra(CalendarContract.EXTRA_CUSTOM_APP_URI));
+            String search = uri.getLastPathSegment();
+            // TODO: activate search
         } else if (intent.getExtras() != null) {
             // Only change intent if it actually contains a filter
             setIntent(intent);

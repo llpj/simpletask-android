@@ -2,6 +2,7 @@
  *
  * Copyright (c) 2009-2012 Todo.txt contributors (http://todotxt.com)
  * Copyright (c) 2013- Mark Janssen
+ * Copyright (c) 2015 Vojtech Kral
  *
  * LICENSE:
  *
@@ -20,6 +21,7 @@
  * @license http://www.gnu.org/licenses/gpl.html
  * @copyright 2009-2012 Todo.txt contributors (http://todotxt.com)
  * @copyright 2013- Mark Janssen
+ * @copyright 2015 Vojtech Kral
  */
 package nl.mpcjanssen.simpletask;
 
@@ -38,7 +40,6 @@ import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
 import android.os.AsyncTask;
 import android.preference.PreferenceManager;
-import android.support.multidex.MultiDexApplication;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 import android.view.Window;
@@ -55,9 +56,9 @@ import nl.mpcjanssen.simpletask.task.TaskCache;
 import nl.mpcjanssen.simpletask.util.Util;
 
 
-public class SimpletaskApplication extends MultiDexApplication implements SharedPreferences.OnSharedPreferenceChangeListener {
-    private final static String TAG = SimpletaskApplication.class.getSimpleName();
-        private static Context m_appContext;
+public class TodoApplication extends Application implements SharedPreferences.OnSharedPreferenceChangeListener {
+    private final static String TAG = TodoApplication.class.getSimpleName();
+    private static Context m_appContext;
     private static SharedPreferences m_prefs;
     private LocalBroadcastManager localBroadcastManager;
 
@@ -65,7 +66,10 @@ public class SimpletaskApplication extends MultiDexApplication implements Shared
     private FileStoreInterface mFileStore;
     @Nullable
     private TaskCache m_taskCache;
+    private CalendarSync m_calSync;
     private BroadcastReceiver m_broadcastReceiver;
+
+    public static final boolean API16 = android.os.Build.VERSION.SDK_INT >= 16;
 
     public static Context getAppContext() {
         return m_appContext;
@@ -78,8 +82,9 @@ public class SimpletaskApplication extends MultiDexApplication implements Shared
     @Override
     public void onCreate() {
         super.onCreate();
-        SimpletaskApplication.m_appContext = getApplicationContext();
-        SimpletaskApplication.m_prefs = PreferenceManager.getDefaultSharedPreferences(getAppContext());
+        TodoApplication.m_appContext = getApplicationContext();
+        TodoApplication.m_prefs = PreferenceManager.getDefaultSharedPreferences(getAppContext());
+        m_calSync = new CalendarSync(this, isSyncDues(), isSyncThresholds());
         localBroadcastManager = LocalBroadcastManager.getInstance(this);
         IntentFilter intentFilter = new IntentFilter();
         intentFilter.addAction(Constants.BROADCAST_UPDATE_UI);
@@ -91,6 +96,7 @@ public class SimpletaskApplication extends MultiDexApplication implements Shared
                     // File change reload task cache
                     resetTaskCache();
                 } else if (intent.getAction().equals(Constants.BROADCAST_UPDATE_UI)) {
+                    m_calSync.syncLater();
                     updateWidgets();
                 }
             }
@@ -182,6 +188,18 @@ public class SimpletaskApplication extends MultiDexApplication implements Shared
 
     public boolean showTxtOnly() {
         return m_prefs.getBoolean(getString(R.string.show_txt_only), false);
+    }
+
+    public boolean isSyncDues() {
+        return API16 && m_prefs.getBoolean(getString(R.string.calendar_sync_dues), false);
+    }
+
+    public boolean isSyncThresholds() {
+        return API16 && m_prefs.getBoolean(getString(R.string.calendar_sync_thresholds), false);
+    }
+
+    public int getRemindersMarginDays() {
+        return m_prefs.getInt(getString(R.string.calendar_reminder_days), 1);
     }
 
     public String getTodoFileName() {
@@ -376,6 +394,12 @@ public class SimpletaskApplication extends MultiDexApplication implements Shared
             if (mFileStore!=null) {
                 mFileStore.setEol(getEol());
             }
+        } else if (s.equals(getString(R.string.calendar_sync_dues))) {
+            m_calSync.setSyncDues(isSyncDues());
+        } else if (s.equals(getString(R.string.calendar_sync_thresholds))) {
+            m_calSync.setSyncThresholds(isSyncThresholds());
+        } else if (s.equals(getString(R.string.calendar_reminder_days))) {
+            m_calSync.syncLater();
         }
     }
 

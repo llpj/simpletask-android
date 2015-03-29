@@ -4,6 +4,7 @@
 This file is part of Todo.txt Touch, an Android app for managing your todo.txt file (http://todotxt.com).
 
 Copyright (c) 2009-2012 Todo.txt contributors (http://todotxt.com)
+Copyright (c) 2015 Vojtech Kral
 
 LICENSE:
 
@@ -21,6 +22,7 @@ You should have received a copy of the GNU General Public License along with Tod
 @author Todo.txt contributors <todotxt@yahoogroups.com>
 @license http://www.gnu.org/licenses/gpl.html
 @copyright 2009-2012 Todo.txt contributors (http://todotxt.com)
+@copyright 2015 Vojtech Kral
 -->
 <!--suppress ALL -->
 <resources>
@@ -99,6 +101,7 @@ You should have received a copy of the GNU General Public License along with Tod
     <string name="widget_theme_pref_key">widget_theme</string>
     <string name="widget_extended_pref_key">widget_extended</string>
     <string name="dropbox_cat_key">dropbox_category</string>
+    <string name="behavior_cat_key">behavior_category</string>
     <string name="clone_tags_key">clone_tags</string>
     <string name="word_wrap_key">word_wrap</string>
     <string name="color_due_date_key">color_due_date</string>
@@ -117,6 +120,10 @@ You should have received a copy of the GNU General Public License along with Tod
     <string name="show_hidden">show_hidden</string>
     <string name="show_empty_lists">show_empty_lists</string>
     <string name="show_txt_only">show_txt_only</string>
+    <string name="calendar_sync_screen">calendar_sync_screen</string>
+    <string name="calendar_sync_dues">calendar_sync_dues</string>
+    <string name="calendar_sync_thresholds">calendar_sync_thresholds</string>
+    <string name="calendar_reminder_days">calendar_reminder_days</string>
     <string name="ui_complete_checkbox">ui_complete_checkbox</string>
     <string name="ui_show_calendarview">ui_show_calendarview</string>
     <string name="ui_sort_case_sensitive">ui_sort_case_sensitive</string>

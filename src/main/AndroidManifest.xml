@@ -17,6 +17,7 @@ You should have received a copy of the GNU General Public License along with Sim
 @license http://www.gnu.org/licenses/gpl.html
 @copyright 2009-2012 Todo.txt contributors (http://todotxt.com)
 @copyright 2012-2013  Mark Janssen
+@copyright 2015 Vojtech Kral
 -->
 <!-- package name and version codes are overwritten by Gradle -->
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
@@ -24,6 +25,8 @@ You should have received a copy of the GNU General Public License along with Sim
     package="nl.mpcjanssen.simpletask" >
 
     <uses-permission android:name="com.android.launcher.permission.INSTALL_SHORTCUT"/>
+    <uses-permission android:name="android.permission.READ_CALENDAR" />
+    <uses-permission android:name="android.permission.WRITE_CALENDAR" />
 
     <supports-screens
             android:anyDensity="true"
@@ -112,6 +115,11 @@ You should have received a copy of the GNU General Public License along with Sim
             </intent-filter>
             <intent-filter>
                 <action android:name="android.intent.action.SEARCH"/>
+            </intent-filter>
+            <intent-filter>
+                <action android:name="android.provider.calendar.action.HANDLE_CUSTOM_EVENT" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <data android:mimeType="vnd.android.cursor.item/event" />
             </intent-filter>
             <meta-data
                     android:name="android.app.searchable"
